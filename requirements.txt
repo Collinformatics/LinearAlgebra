@@ -1,0 +1,8 @@
+jax[cuda13]
+numpy
+pandas
+matplotlib
+scipy
+sympy
+
+networkx
