@@ -76,24 +76,37 @@ class LinearAlgebra:
             os.mkdir(self.figPath)
 
 
-    def plotGraph(self, edges, title, figName):
+    def saveFig(self, plot, figureName, fig=None):
+        if figureName:
+            path = os.path.join(self.figPath, figureName)
+            plot.savefig(path, bbox_inches='tight')
+            print(f'Figure was saved at path:\n\t{path}\n')
+            subprocess.run(['xdg-open', path])  # Open fig in web browser
+        else:
+            fig.canvas.mpl_connect('key_press_event', pressKey)
+            plt.show()
+
+
+    def plotGraph(self, edges, title, figName, nodeSize = 1000, plotFig=True):
         G = nx.Graph()
         G.add_edges_from(edges)
         fig, ax = plt.subplots(figsize=self.figSize)
         nx.draw(
             G, ax=ax, with_labels=True,
-            node_size=1000, node_color='lightgreen',
+            node_size=nodeSize, node_color='lightgreen',
             font_size=14, font_color='black', font_weight='bold',
             width=2.0, edge_color='black'
         )
         ax.set_title(title, fontsize=self.labelSizeTitle, fontweight='bold')
+        plt.tight_layout()
 
-        if '.' not in figName:
-            figName += '.png'
-        savePath = os.path.join(self.figPath, figName)
-        plt.savefig(savePath, bbox_inches='tight')
-        print(f'Figure was saved at path:\n\t{savePath}\n')
-        subprocess.run(['xdg-open', savePath]) # Open fig in web browser
+        # Save figure
+        if plotFig:
+            if '.' not in figName:
+                figName += '.png'
+            self.saveFig(plot=plt, figureName=figName)
+
+        return G
 
 
     def plotLines(self, data, colors, title,
@@ -131,14 +144,4 @@ class LinearAlgebra:
             spine.set_visible(True)
 
         plt.tight_layout()
-        if browserFig:
-            import subprocess
-
-            # Save figure
-            savePath = os.path.join(self.figPath, f'{browserFig}.png')
-            plt.savefig(savePath, bbox_inches='tight')
-            print(f'Figure was saved at path:\n\t{savePath}\n')
-            subprocess.run(['xdg-open', savePath])  # Open fig in web browser
-        else:
-            fig.canvas.mpl_connect('key_press_event', pressKey)
-            plt.show()
+        self.saveFig(plot=plt, figureName=browserFig, fig=fig)

@@ -9,12 +9,11 @@ PageRank algorithm Google used to revolutionize web search. Along the way, we’
 about eigenvectors, one of the most powerful ideas in linear algebra.
 """
 
+from collections import Counter
 from functions import LinearAlgebra
-import networkx as nx
-import numpy as np
-import pandas as pd
-import sympy as sp
+import random
 from utils import decorate
+
 
 la = LinearAlgebra()
 
@@ -34,7 +33,8 @@ As a small example, we’ll create a graph that represents just a few of the roo
 connections between them (based on the actual layout of the Gardner Museum).
 """
 
-edges = [
+inPlotGraph = False
+inEdges = [
     ("Lobby", "Living Room"),
     ("Lobby", "Shop"),
     ("Lobby", "Main Stair"),
@@ -42,4 +42,32 @@ edges = [
     ("Main Stair", "Café"),
     ("Café", "Garden"),
 ]
-la.plotGraph(edges=edges, title='Museum', figName='ch1_graph')
+graph = la.plotGraph(
+    edges=inEdges, title='Museum', figName='ch1_graph', nodeSize=1200, plotFig=inPlotGraph
+)
+
+"""
+Random walk:
+
+Now we will simulate a random walk through the museum. 
+We'll use a Counter to keep track of the number of times each room is visited. 
+Then divide through by the number of iterations, so the values in the Counter sum to one.
+"""
+
+def randomWalk(G, start, iters=1000):
+    print(f'Random Walk:')
+    counter = Counter()
+    node = start
+
+    for _ in range(iters):
+        node = random.choice(list(G[node]))
+        counter[node] += 1
+
+    for key in counter:
+        counter[key] /= iters
+
+    for k, v in counter.items():
+        print(f'* {k}: {v}')
+    print()
+
+randomWalk(G=graph, start='Lobby')
