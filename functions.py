@@ -62,18 +62,19 @@ class LinearAlgebra:
         self.printN = 10
 
         # Params: Figures
-        self.figPath = 'Figures'
+        self.figDir = 'Figures'
         self.figSize = (9.5, 8) # (width, height)
         self.figSizeWide = (9.5, 5)
-        self.labelSizeTitle = 20 # Set font-sizeself.figPath='Figures'
+        self.labelSizeTitle = 20 # Set font-sizeself.figDir='Figures'
         self.labelSizeAxis = 16 # Set font-size
         self.labelSizeTicks = 12 # Set font-size
         self.lineThickness = 1.5
         self.tickLength = 4
         self.figureResolution = 600
 
-        if not os.path.exists(self.figPath):
-            os.mkdir(self.figPath)
+        if not os.path.exists(self.figDir):
+            os.makedirs(self.figDir, exist_ok=True)
+
 
     def randomWalk(self, G, start, iters=1000):
         print(f'Random Walk:')
@@ -94,7 +95,7 @@ class LinearAlgebra:
 
     def saveFig(self, plot, figureName, fig=None):
         if figureName:
-            path = os.path.join(self.figPath, figureName)
+            path = os.path.join(self.figDir, figureName)
             plot.savefig(path, bbox_inches='tight')
             print(f'Figure was saved at path:\n\t{path}\n')
             subprocess.run(['xdg-open', path])  # Open fig in web browser
