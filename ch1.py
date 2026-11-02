@@ -10,11 +10,10 @@ about eigenvectors, one of the most powerful ideas in linear algebra.
 """
 
 from functions import LinearAlgebra
-import pandas as pd
 from utils import decorate
 
 
-# Initialize
+# Initialize class
 la = LinearAlgebra()
 
 """
@@ -32,7 +31,6 @@ compute their probability of being in each room.
 As a small example, we’ll create a graph that represents just a few of the rooms and the 
 connections between them (based on the actual layout of the Gardner Museum).
 """
-
 inPlotGraph = False
 inEdges = [
     ("Lobby", "Living Room"),
@@ -53,5 +51,11 @@ Now we will simulate a random walk through the museum.
 We'll use a Counter to keep track of the number of times each room is visited. 
 Then divide through by the number of iterations, so the values in the Counter sum to one.
 """
-
 la.randomWalk(G=graph, start='Lobby')
+
+
+"""
+Adjacency Matrix:
+
+"""
+la.adjacencyMatrix(G=graph)

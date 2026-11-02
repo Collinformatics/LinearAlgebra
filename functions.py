@@ -76,7 +76,17 @@ class LinearAlgebra:
             os.makedirs(self.figDir, exist_ok=True)
 
 
-    def randomWalk(self, G, start, iters=1000):
+    @staticmethod
+    def adjacencyMatrix(G):
+        print(f'Adjacency Matrix:')
+        array = nx.to_numpy_array(G).astype(int)
+        print(f'Array:\n{array}\n')
+        df = pd.DataFrame(array, index=G.nodes, columns=G.nodes)
+        print(f'{df}\n\n')
+
+
+    @staticmethod
+    def randomWalk(G, start, iters=1000):
         print(f'Random Walk:')
         counter = Counter()
         node = start
@@ -90,7 +100,7 @@ class LinearAlgebra:
 
         d = pd.DataFrame(counter.values(), index=list(counter.keys()),
                          columns=['Probability'])
-        print(f'{d}\n')
+        print(f'{d}\n\n')
 
 
     def saveFig(self, plot, figureName, fig=None):
