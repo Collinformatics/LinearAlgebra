@@ -57,5 +57,7 @@ la.randomWalk(G=graph, start='Lobby')
 """
 Adjacency Matrix:
 
+Each element is either 1 to indicate that there is an edge between two nodes or 0 to 
+indicate that there is not.
 """
 la.adjacencyMatrix(G=graph)
