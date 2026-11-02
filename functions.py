@@ -1,11 +1,11 @@
-import jax
-import os
+from collections import Counter
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import networkx as nx
 import numpy as np
-import pandas as pd
 import os
+import pandas as pd
+import random
 import subprocess
 import sys
 
@@ -14,7 +14,7 @@ import sys
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', 10)
 pd.set_option('display.width', 1000)
-pd.set_option('display.float_format', '{:,.2f}'.format)
+pd.set_option('display.float_format', '{:,.3f}'.format)
 
 # GPU Usage
 # print(f'Jax Device: {jax.default_backend()}')
@@ -74,6 +74,22 @@ class LinearAlgebra:
 
         if not os.path.exists(self.figPath):
             os.mkdir(self.figPath)
+
+    def randomWalk(self, G, start, iters=1000):
+        print(f'Random Walk:')
+        counter = Counter()
+        node = start
+
+        for _ in range(iters):
+            node = random.choice(list(G[node]))
+            counter[node] += 1
+
+        for key in counter:
+            counter[key] /= iters
+
+        d = pd.DataFrame(counter.values(), index=list(counter.keys()),
+                         columns=['Probability'])
+        print(f'{d}\n')
 
 
     def saveFig(self, plot, figureName, fig=None):

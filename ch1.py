@@ -9,12 +9,12 @@ PageRank algorithm Google used to revolutionize web search. Along the way, we’
 about eigenvectors, one of the most powerful ideas in linear algebra.
 """
 
-from collections import Counter
 from functions import LinearAlgebra
-import random
+import pandas as pd
 from utils import decorate
 
 
+# Initialize
 la = LinearAlgebra()
 
 """
@@ -54,20 +54,4 @@ We'll use a Counter to keep track of the number of times each room is visited.
 Then divide through by the number of iterations, so the values in the Counter sum to one.
 """
 
-def randomWalk(G, start, iters=1000):
-    print(f'Random Walk:')
-    counter = Counter()
-    node = start
-
-    for _ in range(iters):
-        node = random.choice(list(G[node]))
-        counter[node] += 1
-
-    for key in counter:
-        counter[key] /= iters
-
-    for k, v in counter.items():
-        print(f'* {k}: {v}')
-    print()
-
-randomWalk(G=graph, start='Lobby')
+la.randomWalk(G=graph, start='Lobby')
