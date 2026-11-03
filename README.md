@@ -13,3 +13,8 @@ Topics:
 - Simulated Random Walk
 - Adjacency Matrix
 - Transition Matrix
+- Dot Product
+- Eigenvectors
+- Linearity
+- PageRank
+- Exercises
