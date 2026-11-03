@@ -60,4 +60,14 @@ Adjacency Matrix:
 Each element is either 1 to indicate that there is an edge between two nodes or 0 to 
 indicate that there is not.
 """
-la.adjacencyMatrix(G=graph)
+adjMatrix = la.adjacencyMatrix(G=graph)
+
+
+"""
+Transition Matrix:
+
+We can use the adjacency matrix to compute a transition matrix, which represents the 
+probability that a random walker moves from each room to the others.
+"""
+la.transitionMatrix(matrix=adjMatrix)
+

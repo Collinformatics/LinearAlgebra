@@ -7,7 +7,9 @@ This repo follows the lessons from "Think Linear Algebra" by Allen B. Downey.
 
 # Chapter 1:
 
-We'll map a museum as a Graph, and simulate a Random Walk to estimate the probability of find our friend in each room.
+Topics:
 
-We can also convert the graph into an Adjacency Matrix to illustrate the edges between the nodes by 1s and 0s.
-
+- Graph
+- Simulated Random Walk
+- Adjacency Matrix
+- Transition Matrix

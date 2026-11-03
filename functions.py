@@ -80,9 +80,17 @@ class LinearAlgebra:
     def adjacencyMatrix(G):
         print(f'Adjacency Matrix:')
         array = nx.to_numpy_array(G).astype(int)
-        print(f'Array:\n{array}\n')
+        # print(f'Array:\n{array}\n')
         df = pd.DataFrame(array, index=G.nodes, columns=G.nodes)
         print(f'{df}\n\n')
+        return df
+
+
+    @staticmethod
+    def transitionMatrix(matrix):
+        print('Transition Matrix:')
+        m = matrix / matrix.sum(axis=0)
+        print(f'{m}\n\n')
 
 
     @staticmethod
