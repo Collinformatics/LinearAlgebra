@@ -13,7 +13,7 @@ Install modules:
 
 Topics:
 
-- Graph
+- Graphs
 - Simulated Random Walk
 - Adjacency Matrix
 - Transition Matrix
