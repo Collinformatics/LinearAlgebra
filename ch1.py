@@ -96,7 +96,7 @@ this hypothetical starting condition.
 """
 N = len(graph)
 x0 = np.full(N, 100)
-print(f'Dot Product:\n'
+print(f'Museum Migration:\n'
       f'{pd.DataFrame([x0], index=['Start Condition'], columns=list(graph.nodes))}')
 """
 And now suppose that everyone leaves the room they are in, choosing one of the exits at 
@@ -105,10 +105,8 @@ random. To find out how many of them end up in the Lobby, we can multiply row0 b
 index = 0
 label = list(graph.nodes)[index]
 row0 = transitionMatrix[index]
-product = x0 * row0
+product = x0 * row0 # Multiply arrays
 print(f'\nx0 * {label}:\n'
       f'{pd.DataFrame([product], index=[label], columns=list(graph.nodes))}\n\n'
       f'{round(product.sum(), 1):,} people have moved to the {label}\n\n')
-
-
 
