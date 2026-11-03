@@ -77,6 +77,15 @@ class LinearAlgebra:
 
 
     @staticmethod
+    def checkList(d):
+        if isinstance(d, nx.classes.reportviews.NodeView):
+            d = list(d)
+        elif not isinstance(d, list):
+            d = [d]
+        print()
+        return d
+
+    @staticmethod
     def adjacencyMatrix(G):
         print(f'Adjacency Matrix:')
         array = nx.to_numpy_array(G).astype(int)
@@ -91,6 +100,14 @@ class LinearAlgebra:
         print('Transition Matrix:')
         m = matrix / matrix.sum(axis=0)
         print(f'{m}\n\n')
+        return m
+
+
+    def showVector(self, vector, idx, col, label='Vector'):
+        idx = self.checkList(idx)
+        col = self.checkList(col)
+        print(f'{label}:')
+        print(pd.DataFrame(vector, index=idx, columns=col))
 
 
     @staticmethod

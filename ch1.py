@@ -10,6 +10,9 @@ about eigenvectors, one of the most powerful ideas in linear algebra.
 """
 
 from functions import LinearAlgebra
+import numpy as np
+import pandas as pd
+import sys
 from utils import decorate
 
 
@@ -60,7 +63,7 @@ Adjacency Matrix:
 Each element is either 1 to indicate that there is an edge between two nodes or 0 to 
 indicate that there is not.
 """
-adjMatrix = la.adjacencyMatrix(G=graph)
+adjacencyMatrix = la.adjacencyMatrix(G=graph)
 
 
 """
@@ -68,6 +71,33 @@ Transition Matrix:
 
 We can use the adjacency matrix to compute a transition matrix, which represents the 
 probability that a random walker moves from each room to the others.
-"""
-la.transitionMatrix(matrix=adjMatrix)
 
+Each row is a 1-D array, like a vector.
+
+We can interpret the elements of this vector as transition probabilities from other rooms 
+to the Lobby. 
+For example, the element corresponding to the Living Room is 0.5, which means that if 
+someone is in the Living Room and they follow a random edge, the probability they end up 
+in the Lobby is 0.5. 
+If they leave the Shop, the probability is 1, and if they leave the Main Stair, the 
+probability is 0.333.
+"""
+transitionMatrix = la.transitionMatrix(matrix=adjacencyMatrix)
+la.showVector(vector=transitionMatrix, idx='Lobby', col=graph.nodes)
+
+sys.exit()
+"""
+Dot Product:
+
+Now suppose there are 100 people in every room. We can create an array that represents 
+this hypothetical starting condition.
+"""
+N = len(graph)
+x0 = np.full(N, 100)
+print(f'Starting Conditions:\n{x0}\n')
+"""
+And now suppose that everyone leaves the room they are in, choosing one of the exits at 
+random. To find out how many of them end up in the Lobby, we can multiply row0 by x
+"""
+product = x0 * v
+print(product)
