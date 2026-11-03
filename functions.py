@@ -82,32 +82,41 @@ class LinearAlgebra:
             d = list(d)
         elif not isinstance(d, list):
             d = [d]
-        print()
         return d
 
-    @staticmethod
-    def adjacencyMatrix(G):
+
+    def showMatrix(self, a, i, c, pSpace=True):
+        i = self.checkList(i)
+        c = self.checkList(c)
+        print(pd.DataFrame(a, index=i, columns=c))
+        if pSpace:
+            print('\n')
+
+
+    def showVector(self, matrix, vector, idx, col, label='Vector', pSpace=True):
+        idx = self.checkList(idx)
+        col = self.checkList(col)
+        print(f'{label}:')
+        print(pd.DataFrame(matrix, index=idx, columns=col).loc[[vector], :])
+        if pSpace:
+            print('\n')
+
+
+    def adjacencyMatrix(self, G):
         print(f'Adjacency Matrix:')
         array = nx.to_numpy_array(G).astype(int)
         # print(f'Array:\n{array}\n')
         df = pd.DataFrame(array, index=G.nodes, columns=G.nodes)
-        print(f'{df}\n\n')
-        return df
+        # print(f'{df}\n\n')
+        self.showMatrix(a=array, i=G.nodes, c=G.nodes)
+        return array
 
 
-    @staticmethod
-    def transitionMatrix(matrix):
+    def transitionMatrix(self, matrix, idx, col):
         print('Transition Matrix:')
-        m = matrix / matrix.sum(axis=0)
-        print(f'{m}\n\n')
+        m = matrix / matrix.sum(axis=0, keepdims=True)
+        self.showMatrix(m, i=idx, c=col)
         return m
-
-
-    def showVector(self, vector, idx, col, label='Vector'):
-        idx = self.checkList(idx)
-        col = self.checkList(col)
-        print(f'{label}:')
-        print(pd.DataFrame(vector, index=idx, columns=col))
 
 
     @staticmethod

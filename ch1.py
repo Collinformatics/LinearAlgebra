@@ -82,10 +82,12 @@ in the Lobby is 0.5.
 If they leave the Shop, the probability is 1, and if they leave the Main Stair, the 
 probability is 0.333.
 """
-transitionMatrix = la.transitionMatrix(matrix=adjacencyMatrix)
-la.showVector(vector=transitionMatrix, idx='Lobby', col=graph.nodes)
+transitionMatrix = la.transitionMatrix(
+    matrix=adjacencyMatrix, idx=graph.nodes, col=graph.nodes
+)
+la.showVector(matrix=transitionMatrix, vector='Lobby', idx=graph.nodes, col=graph.nodes)
 
-sys.exit()
+
 """
 Dot Product:
 
@@ -94,10 +96,19 @@ this hypothetical starting condition.
 """
 N = len(graph)
 x0 = np.full(N, 100)
-print(f'Starting Conditions:\n{x0}\n')
+print(f'Dot Product:\n'
+      f'{pd.DataFrame([x0], index=['Start Condition'], columns=list(graph.nodes))}')
 """
 And now suppose that everyone leaves the room they are in, choosing one of the exits at 
 random. To find out how many of them end up in the Lobby, we can multiply row0 by x
 """
-product = x0 * v
-print(product)
+index = 0
+label = list(graph.nodes)[index]
+row0 = transitionMatrix[index]
+product = x0 * row0
+print(f'\nx0 * {label}:\n'
+      f'{pd.DataFrame([product], index=[label], columns=list(graph.nodes))}\n\n'
+      f'{round(product.sum(), 1):,} people have moved to the {label}\n\n')
+
+
+
