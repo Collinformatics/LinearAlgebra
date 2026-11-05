@@ -34,6 +34,8 @@ pd.set_option('display.max_rows', 10)
 pd.set_option('display.width', 1000)
 pd.set_option('display.float_format', '{:,.3f}'.format)
 
+roundVal = 2
+
 # Initialize class
 la = LinearAlgebra()
 
@@ -124,7 +126,7 @@ index = 0
 label = list(graph.nodes)[index]
 row0 = transitionMatrix[index]
 product = x0 * row0 # Multiply arrays
-nMigrants = round(product.sum(), 1)
+nMigrants = round(product.sum(), roundVal)
 la.showVector(matrix=[product], idx=[label], col=graph.nodes,
               label=f'x0 * {label}', pSpace=False)
 print(f'\n* A total of {red}{nMigrants:,}{rst} people have moved to the {label}')
@@ -132,15 +134,19 @@ print(f'\n* A total of {red}{nMigrants:,}{rst} people have moved to the {label}'
 The sum of elementwise products is an “inner product”, more often called a dot product 
 because the operator used to denote it is a dot.
 """
-dotProd = round(row0.dot(x0), 1)
-print(f'* Dot Product: row0.dot(x0) = {red}{dotProd:,}{rst}')
-dotProd = round(row0@x0, 1)
-print(f'* Dot Product: row0 @ x0 = {red}{dotProd:,}{rst}\n\n')
+dotProd = row0.dot(x0)
+print(f'* Dot Product: row0.dot(x0) = {red}{round(dotProd, roundVal):,}{rst}')
+dotProd = row0 @ x0
+print(f'* Dot Product: row0 @ x0 = {red}{round(dotProd, roundVal):,}{rst}\n\n')
 """
 THe @ operator also allows for multiplying a matrix and vector
 """
-x1 = np.round(transitionMatrix @ x0, 2).tolist()
-la.showVector([x1], idx='Migration', col=graph.nodes,
-              label='Matrix @ Vector', label2='x1 = transitionMatrix @ x0')
-# print(f'* Dot Product: transitionMatrix @ x0 = {red}{x1}{rst}')
+x1 = transitionMatrix @ x0
+la.showVector([x1], idx='Migration', col=graph.nodes, label='Museum Migration (x1)',
+              label2='x1 = Matrix @ Vector = transitionMatrix @ x0', pSpace=False)
+print(f'\nTotal people: {red}{round(sum(x1), roundVal):,}{rst}\n\n')
+"""
+We can use this to simulate a random walk for n number of steps
+"""
+la.simRandomWalk(transMatrix=transitionMatrix, x0=x0, col=graph.nodes, steps=20)
 

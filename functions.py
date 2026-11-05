@@ -139,6 +139,16 @@ class LinearAlgebra:
         return m
 
 
+    def simRandomWalk(self, transMatrix, x0, steps, col):
+        x = x0
+        for _ in range(steps):
+            x = transMatrix @ x
+        self.showVector(matrix=[x], idx='Migration', col=col,
+                        label='Random Walk', label2=f'{steps:,} steps', pSpace=False)
+        print(f'\nTotal people: {red}{round(sum(x), 2):,}{rst}\n\n')
+        return x
+
+
     @staticmethod
     def randomWalk(G, start, iters=1000):
         print(f'Random Walk:')
