@@ -91,6 +91,11 @@ class LinearAlgebra:
 
 
     @staticmethod
+    def header(n=80):
+        print('='*n)
+
+
+    @staticmethod
     def checkList(d):
         if isinstance(d, nx.classes.reportviews.NodeView):
             d = list(d)
@@ -99,7 +104,10 @@ class LinearAlgebra:
         return d
 
 
-    def showMatrix(self, a, i, c, label='Matrix', label2='', pSpace=True):
+    def showMatrix(self, a, i, c, label='Matrix', label2='',
+                   pSpace=True, pHeader=True):
+        if pHeader:
+            self.header()
         i = self.checkList(i)
         c = self.checkList(c)
         if label2:
@@ -112,7 +120,9 @@ class LinearAlgebra:
 
 
     def showVector(self, matrix, idx, col, vector=False, label='Vector',
-                   label2='', pSpace=True):
+                   label2='', pSpace=True, pHeader=True):
+        if pHeader:
+            self.header()
         idx = self.checkList(idx)
         col = self.checkList(col)
         if label2:
@@ -140,18 +150,24 @@ class LinearAlgebra:
 
 
     def simRandomWalk(self, transMatrix, x0, steps, col):
+        self.header()
+        print('Simulate Random Walk')
         x = x0
         for _ in range(steps):
-            x = transMatrix @ x
+            x = transMatrix @ x # Matrix-vector multiplication
         self.showVector(matrix=[x], idx='Migration', col=col,
-                        label='Random Walk', label2=f'{steps:,} steps', pSpace=False)
-        print(f'\nTotal people: {red}{round(sum(x), 2):,}{rst}\n\n')
-        return x
+                        label='Population', label2=f'{steps:,} steps',
+                        pSpace=False, pHeader=False)
+        n = sum(x)
+        print(f'\nTotal people: {red}{round(n, 2):,}{rst}\n')
+        prob = x / n
+        self.showVector(matrix=[prob], idx='Migration', col=col,
+                        label='Probability', label2=f'{steps:,} steps',
+                        pSpace=False, pHeader=False)
+        return x, prob
 
 
-    @staticmethod
-    def randomWalk(G, start, iters=1000):
-        print(f'Random Walk:')
+    def randomWalk(self, G, start, iters=1000):
         counter = Counter()
         node = start
 
@@ -162,12 +178,12 @@ class LinearAlgebra:
         for key in counter:
             counter[key] /= iters
 
-        d = pd.DataFrame(counter.values(), index=list(counter.keys()),
-                         columns=['Probability'])
-        print(f'{d}\n\n')
+        self.showVector(matrix=[counter.values()], idx='Probability', col=G.nodes,
+                        label='Random Walk')
 
 
     def saveFig(self, plot, figureName, fig=None):
+        self.header()
         if figureName:
             path = os.path.join(self.figDir, figureName)
             plot.savefig(path, bbox_inches='tight')

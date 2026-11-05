@@ -39,8 +39,9 @@ roundVal = 2
 # Initialize class
 la = LinearAlgebra()
 
+
 """
-1.1. A Day at the Museum
+1.1. A Day at the Museum:
 
 Suppose you are meeting a friend at the Isabella Stewart Gardner Museum in Boston. You 
 have not agreed on a meeting place – and let’s assume your cell phone is dead. If you are 
@@ -78,14 +79,12 @@ la.randomWalk(G=graph, start='Lobby')
 
 
 """
-Adjacency Matrix:
+1.2 Adjacency Matrix:
 
 Each element is either 1 to indicate that there is an edge between two nodes or 0 to 
 indicate that there is not.
 """
 adjacencyMatrix = la.adjacencyMatrix(G=graph)
-
-
 """
 Transition Matrix:
 
@@ -109,7 +108,7 @@ la.showVector(matrix=transitionMatrix, vector='Lobby', idx=graph.nodes, col=grap
 
 
 """
-Dot Product:
+1.3 Dot Product:
 
 Now suppose there are 100 people in every room. We can create an array that represents 
 this hypothetical starting condition.
@@ -148,5 +147,15 @@ print(f'\nTotal people: {red}{round(sum(x1), roundVal):,}{rst}\n\n')
 """
 We can use this to simulate a random walk for n number of steps
 """
-la.simRandomWalk(transMatrix=transitionMatrix, x0=x0, col=graph.nodes, steps=20)
+xFinal, xFinalProb = la.simRandomWalk(
+    transMatrix=transitionMatrix, x0=x0, col=graph.nodes, steps=100
+)
+
+
+"""
+1.4 Eigenvectors:
+
+
+"""
+
 
