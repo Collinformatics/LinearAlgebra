@@ -151,19 +151,17 @@ class LinearAlgebra:
 
     def simRandomWalk(self, transMatrix, x0, steps, col):
         self.header()
-        print('Simulate Random Walk')
+        print(f'Simulate Random Walk\nN Steps: {pink}{steps:,}{rst}\n')
         x = x0
         for _ in range(steps):
             x = transMatrix @ x # Matrix-vector multiplication
         self.showVector(matrix=[x], idx='Migration', col=col,
-                        label='Population', label2=f'{steps:,} steps',
-                        pSpace=False, pHeader=False)
+                        label='Population', pSpace=False, pHeader=False)
         n = sum(x)
         print(f'\nTotal people: {red}{round(n, 2):,}{rst}\n')
         prob = x / n
         self.showVector(matrix=[prob], idx='Migration', col=col,
-                        label='Probability', label2=f'{steps:,} steps',
-                        pSpace=False, pHeader=False)
+                        label='Probability', pSpace=False, pHeader=False)
         return x, prob
 
 
