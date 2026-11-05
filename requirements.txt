@@ -1,8 +1,8 @@
+colorama
 jax[cuda13]
 numpy
 pandas
 matplotlib
+networkx
 scipy
 sympy
-
-networkx

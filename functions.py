@@ -1,4 +1,5 @@
 from collections import Counter
+from colorama import Fore, Style
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import networkx as nx
@@ -9,6 +10,19 @@ import random
 import subprocess
 import sys
 
+
+# Define colors
+red = Fore.LIGHTRED_EX
+gold = Fore.YELLOW
+yellow = Fore.LIGHTYELLOW_EX
+green = Fore.GREEN
+cyan = Fore.LIGHTCYAN_EX
+blue = Fore.LIGHTBLUE_EX
+pink = Fore.LIGHTMAGENTA_EX
+magenta = Fore.MAGENTA
+white = Fore.LIGHTWHITE_EX
+bold = Style.BRIGHT
+rst = Style.RESET_ALL
 
 # Set options
 pd.set_option('display.max_columns', None)
@@ -85,37 +99,36 @@ class LinearAlgebra:
         return d
 
 
-    def showMatrix(self, a, i, c, pSpace=True):
+    def showMatrix(self, a, i, c, label='Matrix', pSpace=True):
         i = self.checkList(i)
         c = self.checkList(c)
+        print(f'{green}{label}{rst}:')
         print(pd.DataFrame(a, index=i, columns=c))
         if pSpace:
             print('\n')
 
 
-    def showVector(self, matrix, vector, idx, col, label='Vector', pSpace=True):
+    def showVector(self, matrix, idx, col, vector=False, label='Vector', pSpace=True):
         idx = self.checkList(idx)
         col = self.checkList(col)
-        print(f'{label}:')
-        print(pd.DataFrame(matrix, index=idx, columns=col).loc[[vector], :])
+        print(f'{gold}{label}{rst}:')
+        if vector:
+            print(pd.DataFrame(matrix, index=idx, columns=col).loc[[vector], :])
+        else:
+            print(pd.DataFrame(matrix, index=idx, columns=col))
         if pSpace:
             print('\n')
 
 
     def adjacencyMatrix(self, G):
-        print(f'Adjacency Matrix:')
         array = nx.to_numpy_array(G).astype(int)
-        # print(f'Array:\n{array}\n')
-        df = pd.DataFrame(array, index=G.nodes, columns=G.nodes)
-        # print(f'{df}\n\n')
-        self.showMatrix(a=array, i=G.nodes, c=G.nodes)
+        self.showMatrix(a=array, i=G.nodes, c=G.nodes, label='Adjacency Matrix')
         return array
 
 
     def transitionMatrix(self, matrix, idx, col):
-        print('Transition Matrix:')
         m = matrix / matrix.sum(axis=0, keepdims=True)
-        self.showMatrix(m, i=idx, c=col)
+        self.showMatrix(m, i=idx, c=col, label='Transition Matrix')
         return m
 
 
@@ -141,7 +154,7 @@ class LinearAlgebra:
         if figureName:
             path = os.path.join(self.figDir, figureName)
             plot.savefig(path, bbox_inches='tight')
-            print(f'Figure was saved at path:\n\t{path}\n')
+            print(f'Figure was saved at path:\n\t{green}{path}{rst}\n')
             subprocess.run(['xdg-open', path])  # Open fig in web browser
         else:
             fig.canvas.mpl_connect('key_press_event', pressKey)

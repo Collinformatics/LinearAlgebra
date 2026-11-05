@@ -9,11 +9,24 @@ PageRank algorithm Google used to revolutionize web search. Along the way, we’
 about eigenvectors, one of the most powerful ideas in linear algebra.
 """
 
+from colorama import Fore, Style
 from functions import LinearAlgebra
 import numpy as np
 import pandas as pd
 import sys
 from utils import decorate
+
+
+# Define colors
+red = Fore.LIGHTRED_EX
+gold = Fore.YELLOW
+yellow = Fore.LIGHTYELLOW_EX
+cyan = Fore.LIGHTCYAN_EX
+blue = Fore.LIGHTBLUE_EX
+pink = Fore.LIGHTMAGENTA_EX
+white = Fore.LIGHTWHITE_EX
+bold = Style.BRIGHT
+rst = Style.RESET_ALL
 
 
 # Initialize class
@@ -96,8 +109,7 @@ this hypothetical starting condition.
 """
 N = len(graph)
 x0 = np.full(N, 100)
-print(f'Museum Migration:\n'
-      f'{pd.DataFrame([x0], index=['Start Condition'], columns=list(graph.nodes))}')
+la.showVector(matrix=[x0], idx='Start Condition', col=graph.nodes, label='Museum Migration')
 """
 And now suppose that everyone leaves the room they are in, choosing one of the exits at 
 random. To find out how many of them end up in the Lobby, we can multiply row0 by x
@@ -106,7 +118,13 @@ index = 0
 label = list(graph.nodes)[index]
 row0 = transitionMatrix[index]
 product = x0 * row0 # Multiply arrays
-print(f'\nx0 * {label}:\n'
-      f'{pd.DataFrame([product], index=[label], columns=list(graph.nodes))}\n\n'
-      f'{round(product.sum(), 1):,} people have moved to the {label}\n\n')
+la.showVector(matrix=[product], idx=[label], col=graph.nodes,
+              label=f'x0 * {label}', pSpace=False)
+print(f'\nA total of {red}{round(product.sum(), 1):,}{rst} '
+      f'people have moved to the {label}\n\n')
 
+
+
+"""
+
+"""
