@@ -28,6 +28,11 @@ white = Fore.LIGHTWHITE_EX
 bold = Style.BRIGHT
 rst = Style.RESET_ALL
 
+# Set options
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', 10)
+pd.set_option('display.width', 1000)
+pd.set_option('display.float_format', '{:,.3f}'.format)
 
 # Initialize class
 la = LinearAlgebra()
@@ -109,7 +114,8 @@ this hypothetical starting condition.
 """
 N = len(graph)
 x0 = np.full(N, 100)
-la.showVector(matrix=[x0], idx='Start Condition', col=graph.nodes, label='Museum Migration')
+la.showVector(matrix=[x0], idx='Start Condition', col=graph.nodes,
+              label='Museum Migration (x0)')
 """
 And now suppose that everyone leaves the room they are in, choosing one of the exits at 
 random. To find out how many of them end up in the Lobby, we can multiply row0 by x
@@ -118,13 +124,23 @@ index = 0
 label = list(graph.nodes)[index]
 row0 = transitionMatrix[index]
 product = x0 * row0 # Multiply arrays
+nMigrants = round(product.sum(), 1)
 la.showVector(matrix=[product], idx=[label], col=graph.nodes,
               label=f'x0 * {label}', pSpace=False)
-print(f'\nA total of {red}{round(product.sum(), 1):,}{rst} '
-      f'people have moved to the {label}\n\n')
-
-
-
+print(f'\n* A total of {red}{nMigrants:,}{rst} people have moved to the {label}')
 """
-
+The sum of elementwise products is an “inner product”, more often called a dot product 
+because the operator used to denote it is a dot.
 """
+dotProd = round(row0.dot(x0), 1)
+print(f'* Dot Product: row0.dot(x0) = {red}{dotProd:,}{rst}')
+dotProd = round(row0@x0, 1)
+print(f'* Dot Product: row0 @ x0 = {red}{dotProd:,}{rst}\n\n')
+"""
+THe @ operator also allows for multiplying a matrix and vector
+"""
+x1 = np.round(transitionMatrix @ x0, 2).tolist()
+la.showVector([x1], idx='Migration', col=graph.nodes,
+              label='Matrix @ Vector', label2='x1 = transitionMatrix @ x0')
+# print(f'* Dot Product: transitionMatrix @ x0 = {red}{x1}{rst}')
+

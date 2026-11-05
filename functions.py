@@ -99,19 +99,26 @@ class LinearAlgebra:
         return d
 
 
-    def showMatrix(self, a, i, c, label='Matrix', pSpace=True):
+    def showMatrix(self, a, i, c, label='Matrix', label2='', pSpace=True):
         i = self.checkList(i)
         c = self.checkList(c)
-        print(f'{green}{label}{rst}:')
+        if label2:
+            print(f'{green}{label}{rst}: {pink}{label2}{rst}')
+        else:
+            print(f'{green}{label}{rst}:')
         print(pd.DataFrame(a, index=i, columns=c))
         if pSpace:
             print('\n')
 
 
-    def showVector(self, matrix, idx, col, vector=False, label='Vector', pSpace=True):
+    def showVector(self, matrix, idx, col, vector=False, label='Vector',
+                   label2='', pSpace=True):
         idx = self.checkList(idx)
         col = self.checkList(col)
-        print(f'{gold}{label}{rst}:')
+        if label2:
+            print(f'{gold}{label}{rst}: {pink}{label2}{rst}')
+        else:
+            print(f'{gold}{label}{rst}:')
         if vector:
             print(pd.DataFrame(matrix, index=idx, columns=col).loc[[vector], :])
         else:
