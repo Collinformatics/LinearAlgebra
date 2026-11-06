@@ -104,7 +104,7 @@ probability is 0.333.
 transitionMatrix = la.transitionMatrix(
     matrix=adjacencyMatrix, idx=rooms, col=rooms
 )
-la.showVector(matrix=transitionMatrix, vector='Lobby', idx=rooms, col=rooms)
+la.showVector(array=transitionMatrix, vector='Lobby', idx=rooms, col=rooms)
 
 
 """
@@ -115,7 +115,7 @@ this hypothetical starting condition.
 """
 N = len(graph)
 x0 = np.full(N, 100)
-la.showVector(matrix=[x0], idx='Start Condition', col=rooms,
+la.showVector(array=[x0], idx='Start Condition', col=rooms,
               label='Museum Migration (x0)')
 """
 And now suppose that everyone leaves the room they are in, choosing one of the exits at 
@@ -126,9 +126,9 @@ label = list(rooms)[index]
 row0 = transitionMatrix[index]
 product = x0 * row0 # Multiply arrays
 nMigrants = round(product.sum(), roundVal)
-la.showVector(matrix=[product], idx=[label], col=rooms,
+la.showVector(array=[product], idx=[label], col=rooms,
               label=f'x0 * {label}', pSpace=False)
-print(f'\n* A total of {red}{nMigrants:,}{rst} people have moved to the {label}')
+print(f'* A total of {red}{nMigrants:,}{rst} people have moved to the {label}')
 """
 The sum of elementwise products is an “inner product”, more often called a dot product 
 because the operator used to denote it is a dot.
@@ -143,7 +143,7 @@ THe @ operator also allows for multiplying a matrix and vector
 x1 = transitionMatrix @ x0
 la.showVector([x1], idx='Migration', col=rooms, label='Museum Migration (x1)',
               label2='x1 = Matrix @ Vector = transitionMatrix @ x0', pSpace=False)
-print(f'\nTotal people: {red}{round(sum(x1), roundVal):,}{rst}\n\n')
+print(f'Total people: {red}{round(sum(x1), roundVal):,}{rst}\n\n')
 """
 We can use this to simulate a random walk for n number of steps
 """
@@ -159,12 +159,13 @@ In the previous section, we simulated a random walk by multiplying by M 100 time
 let’s see what happens if we multiply the result by M one more time.
 """
 x = transitionMatrix @ xFinalProb
-la.showVector(matrix=[x], idx='Migration', col=rooms,
+la.showVector(array=[x], idx='Migration', col=rooms,
               label='Probability', label2='x = nSteps + 1', pSpace=False)
 """
 Lets compare this vector to xFinalProb
 """
-print(f'\nComparison: np.allclose(x, xFinalProb) = {red}{np.allclose(x, xFinalProb)}{rst}')
+print(f'Comparison: np.allclose(x, xFinalProb) = '
+      f'{red}{np.allclose(x, xFinalProb)}{rst}\n\n')
 """
 np.allclose(x1, x2):
 * True: values are the same within the floating point limit
@@ -183,5 +184,20 @@ algorithm for finding an eigenvector.
 If you start with almost any vector "x" and repeatedly compute: x = M @ x
 the value of "x" converges to an eigenvector of "M" (I’ll explain the “almost” later).
 
+But this method only finds one eigenvector, and in general there can be more than one.
+Also it is not particularly efficient.
+
+SciPy provides a function called eig that implements an efficient algorithm that finds 
+all of the eigenvectors.
+"""
+from scipy.linalg import eig
+vals, vecs = eig(transitionMatrix)
+la.showVector(array=[vals], col=rooms, label='Eigenvalues', pSpace=False)
+la.showMatrix(matrix=vecs, idx=rooms, col=rooms, label='Eigenvectors', pHeader=False)
+"""
+The result is a one-dimensional array of eigenvalues and a two dimensional array of 
+eigenvectors. In this example, there are six eigenvalues.
+
 
 """
+

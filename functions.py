@@ -104,22 +104,23 @@ class LinearAlgebra:
         return d
 
 
-    def showMatrix(self, a, i, c, label='Matrix', label2='',
+    def showMatrix(self, matrix, idx='', col='', label='Matrix', label2='',
                    pSpace=True, pHeader=True):
         if pHeader:
             self.header()
-        i = self.checkList(i)
-        c = self.checkList(c)
+        idx = self.checkList(idx)
+        col = self.checkList(col)
         if label2:
             print(f'{green}{label}{rst}: {pink}{label2}{rst}')
         else:
             print(f'{green}{label}{rst}:')
-        print(pd.DataFrame(a, index=i, columns=c))
+        print(pd.DataFrame(matrix, index=idx, columns=col))
+        print()
         if pSpace:
-            print('\n')
+            print()
 
 
-    def showVector(self, matrix, idx, col, vector=False, label='Vector',
+    def showVector(self, array, idx='', col='', vector=False, label='Vector',
                    label2='', pSpace=True, pHeader=True):
         if pHeader:
             self.header()
@@ -130,22 +131,23 @@ class LinearAlgebra:
         else:
             print(f'{gold}{label}{rst}:')
         if vector:
-            print(pd.DataFrame(matrix, index=idx, columns=col).loc[[vector], :])
+            print(pd.DataFrame(array, index=idx, columns=col).loc[[vector], :])
         else:
-            print(pd.DataFrame(matrix, index=idx, columns=col))
+            print(pd.DataFrame(array, index=idx, columns=col))
+        print()
         if pSpace:
-            print('\n')
+            print()
 
 
     def adjacencyMatrix(self, G):
         array = nx.to_numpy_array(G).astype(int)
-        self.showMatrix(a=array, i=G.nodes, c=G.nodes, label='Adjacency Matrix')
+        self.showMatrix(matrix=array, idx=G.nodes, col=G.nodes, label='Adjacency Matrix')
         return array
 
 
     def transitionMatrix(self, matrix, idx, col):
         m = matrix / matrix.sum(axis=0, keepdims=True)
-        self.showMatrix(m, i=idx, c=col, label='Transition Matrix')
+        self.showMatrix(matrix=m, idx=idx, col=col, label='Transition Matrix')
         return m
 
 
@@ -155,14 +157,14 @@ class LinearAlgebra:
         x = x0
         for _ in range(steps):
             x = transMatrix @ x # Matrix-vector multiplication
-        self.showVector(matrix=[x], idx='Migration', col=col,
+        self.showVector(array=[x], idx='Migration', col=col,
                         label='Population', pSpace=False, pHeader=False)
         n = sum(x)
-        print(f'\nTotal people: {red}{round(n, 2):,}{rst}\n')
+        print(f'Total people: {red}{round(n, 2):,}{rst}\n')
         prob = x / n
-        self.showVector(matrix=[prob], idx='Migration', col=col,
+        self.showVector(array=[prob], idx='Migration', col=col,
                         label='Probability', pSpace=False, pHeader=False)
-        print('\n')
+        print()
         return x, prob
 
 
@@ -177,7 +179,7 @@ class LinearAlgebra:
         for key in counter:
             counter[key] /= iterations
 
-        self.showVector(matrix=[counter.values()], idx='Probability', col=G.nodes,
+        self.showVector(array=[counter.values()], idx='Probability', col=G.nodes,
                         label='Random Walk')
 
 
