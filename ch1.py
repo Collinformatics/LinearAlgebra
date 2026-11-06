@@ -67,7 +67,7 @@ inEdges = [
 graph = la.plotGraph(
     edges=inEdges, title='Museum', figName='ch1_graph', nodeSize=1200, plotFig=inPlotGraph
 )
-
+rooms = graph.nodes
 """
 Random walk:
 
@@ -102,9 +102,9 @@ If they leave the Shop, the probability is 1, and if they leave the Main Stair, 
 probability is 0.333.
 """
 transitionMatrix = la.transitionMatrix(
-    matrix=adjacencyMatrix, idx=graph.nodes, col=graph.nodes
+    matrix=adjacencyMatrix, idx=rooms, col=rooms
 )
-la.showVector(matrix=transitionMatrix, vector='Lobby', idx=graph.nodes, col=graph.nodes)
+la.showVector(matrix=transitionMatrix, vector='Lobby', idx=rooms, col=rooms)
 
 
 """
@@ -115,18 +115,18 @@ this hypothetical starting condition.
 """
 N = len(graph)
 x0 = np.full(N, 100)
-la.showVector(matrix=[x0], idx='Start Condition', col=graph.nodes,
+la.showVector(matrix=[x0], idx='Start Condition', col=rooms,
               label='Museum Migration (x0)')
 """
 And now suppose that everyone leaves the room they are in, choosing one of the exits at 
 random. To find out how many of them end up in the Lobby, we can multiply row0 by x
 """
 index = 0
-label = list(graph.nodes)[index]
+label = list(rooms)[index]
 row0 = transitionMatrix[index]
 product = x0 * row0 # Multiply arrays
 nMigrants = round(product.sum(), roundVal)
-la.showVector(matrix=[product], idx=[label], col=graph.nodes,
+la.showVector(matrix=[product], idx=[label], col=rooms,
               label=f'x0 * {label}', pSpace=False)
 print(f'\n* A total of {red}{nMigrants:,}{rst} people have moved to the {label}')
 """
@@ -141,21 +141,47 @@ print(f'* Dot Product: row0 @ x0 = {red}{round(dotProd, roundVal):,}{rst}\n\n')
 THe @ operator also allows for multiplying a matrix and vector
 """
 x1 = transitionMatrix @ x0
-la.showVector([x1], idx='Migration', col=graph.nodes, label='Museum Migration (x1)',
+la.showVector([x1], idx='Migration', col=rooms, label='Museum Migration (x1)',
               label2='x1 = Matrix @ Vector = transitionMatrix @ x0', pSpace=False)
 print(f'\nTotal people: {red}{round(sum(x1), roundVal):,}{rst}\n\n')
 """
 We can use this to simulate a random walk for n number of steps
 """
 xFinal, xFinalProb = la.simRandomWalk(
-    transMatrix=transitionMatrix, x0=x0, col=graph.nodes, steps=100
+    transMatrix=transitionMatrix, x0=x0, col=rooms, steps=100
 )
 
 
 """
 1.4 Eigenvectors:
 
+In the previous section, we simulated a random walk by multiplying by M 100 times. Now 
+let’s see what happens if we multiply the result by M one more time.
+"""
+x = transitionMatrix @ xFinalProb
+la.showVector(matrix=[x], idx='Migration', col=rooms,
+              label='Probability', label2='x = nSteps + 1', pSpace=False)
+"""
+Lets compare this vector to xFinalProb
+"""
+print(f'\nComparison: np.allclose(x, xFinalProb) = {red}{np.allclose(x, xFinalProb)}{rst}')
+"""
+np.allclose(x1, x2):
+* True: values are the same within the floating point limit
+
+A "True" result implies that Mx = x, for this particular value of "x"
+This means that "x" is an eigenvector of "M"
+
+More generally, "x" is an eigenvector of "M" if Mx = λx, 
+    where λ is an eigenvalue of "M".
+In this example, the eigenvalue that corresponds to the eigenvector we found is.
+
+
+The method we used to simulate a random walk, repeated matrix multiplication, is also an 
+algorithm for finding an eigenvector.
+
+If you start with almost any vector "x" and repeatedly compute: x = M @ x
+the value of "x" converges to an eigenvector of "M" (I’ll explain the “almost” later).
+
 
 """
-
-

@@ -162,19 +162,20 @@ class LinearAlgebra:
         prob = x / n
         self.showVector(matrix=[prob], idx='Migration', col=col,
                         label='Probability', pSpace=False, pHeader=False)
+        print('\n')
         return x, prob
 
 
-    def randomWalk(self, G, start, iters=1000):
+    def randomWalk(self, G, start, iterations=1000):
         counter = Counter()
         node = start
 
-        for _ in range(iters):
+        for _ in range(iterations):
             node = random.choice(list(G[node]))
             counter[node] += 1
 
         for key in counter:
-            counter[key] /= iters
+            counter[key] /= iterations
 
         self.showVector(matrix=[counter.values()], idx='Probability', col=G.nodes,
                         label='Random Walk')
