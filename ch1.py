@@ -23,7 +23,7 @@ gold = Fore.YELLOW
 yellow = Fore.LIGHTYELLOW_EX
 green = Fore.GREEN
 cyan = Fore.LIGHTCYAN_EX
-blue = Fore.LIGHTBLUE_EX
+blue = Fore.BLUE
 pink = Fore.LIGHTMAGENTA_EX
 magenta = Fore.MAGENTA
 white = Fore.LIGHTWHITE_EX
@@ -123,7 +123,7 @@ la.showVector(array=[x0], idx='Start Condition', col=rooms,
 And now suppose that everyone leaves the room they are in, choosing one of the exits at 
 random. To find out how many of them end up in the Lobby, we can multiply row0 by x
 """
-selRoom = 'Shop'
+selRoom = 'Lobby'
 selRoomIdx = rooms.index(selRoom)
 row0 = transitionMatrix[selRoomIdx]
 product = x0 * row0 # Multiply arrays
@@ -161,13 +161,19 @@ In the previous section, we simulated a random walk by multiplying by M 100 time
 let’s see what happens if we multiply the result by M one more time.
 """
 x = transitionMatrix @ xFinalProb
-la.showVector(array=[x], idx='Migration', col=rooms,
-              label='Probability', label2='x = nSteps + 1', pSpace=False)
+la.showVector(array=[x], idx='Migration', col=rooms, label='Probability',
+              label2='transitionMatrix @ xFinalProb = x', pSpace=False)
 """
 Lets compare this vector to xFinalProb
 """
 print(f'Comparison: np.allclose(x, xFinalProb) = '
-      f'{red}{np.allclose(x, xFinalProb)}{rst}\n\n')
+      f'{red}{np.allclose(x, xFinalProb)}{rst}\n'
+      f'\tIf {red}True{rst}, then {cyan}Mx = x{rst}\n\n'
+      f'\tTherefore {cyan}x{rst} is an {magenta}eigenvector{rst} of {cyan}M{rst}\n'
+      f'\t* M is the transitionMatrix\n\n'
+      f'\tGenerally, {cyan}x{rst} is an {magenta}eigenvector{rst} of {cyan}M{rst} '
+      f'when {cyan}Mx = λx{rst}\n'
+      f'\t* Where {cyan}λ{rst} is the {magenta}eigenvalue{rst} of {cyan}M{rst}\n\n')
 """
 np.allclose(x1, x2):
 * True: values are the same within the floating point limit
@@ -225,7 +231,7 @@ vec = vec / s
 la.showVector(array=[vec], idx=selRoom, col=rooms, label=f'Eigenvector',
               label2=f'{selRoom} Normalized', pSpace=False, pHeader=False)
 print(f'Compare {pink}{selRoom} Normalized{rst} to {pink}Simulate Random Walk{rst}:\n'
-      f'\tIf {red}True{rst}, we have found an eigenvector!\n'
+      f'\tIf {red}True{rst}, then eigenvector!\n'
       f'\tnp.allclose(vec, xFinalProb) = {red}{np.allclose(vec, xFinalProb)}{rst}\n')
 
 
