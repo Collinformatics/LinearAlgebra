@@ -126,7 +126,6 @@ class LinearAlgebra:
         else:
             print(f'{green}{label}{rst}:')
         df = pd.DataFrame(matrix, index=idx, columns=col)
-        print(f'Min: {abs(df.loc[:,:].min(axis=None))}')
         if abs(df.loc[:,:].min(axis=None)) > 10**3:
             self.formatFloat(sciNotation=True)
         print(f'{df}\n')

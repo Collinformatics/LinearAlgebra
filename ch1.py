@@ -219,13 +219,13 @@ la.showVector(array=[vec], vector=selRoom, idx=rooms, col=rooms,
 The Lobby vector doesnt look like the vector we found with repeated multiplication, but 
 if we divide through so the elements add up to 1, we’ll see that it is.
 """
-vec = vec / vec.sum()
+s = vec.sum()
+print(f'Vector sum: {s}\n')
+vec = vec / s
 la.showVector(array=[vec], idx=selRoom, col=rooms, label=f'Eigenvector',
               label2=f'{selRoom} Normalized', pSpace=False, pHeader=False)
 print(f'Compare {pink}{selRoom} Normalized{rst} to {pink}Simulate Random Walk{rst}:\n'
+      f'\tIf {red}True{rst}, we have found an eigenvector!\n'
       f'\tnp.allclose(vec, xFinalProb) = {red}{np.allclose(vec, xFinalProb)}{rst}\n')
-print(f'If {red}True{rst}, we have found an eigenvector!\n')
 
-lam = vals[selRoomIdx].real
-print(lam)
-print(np.allclose(transitionMatrix @ vec, lam * vec))
+
