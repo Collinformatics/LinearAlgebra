@@ -21,9 +21,11 @@ from utils import decorate
 red = Fore.LIGHTRED_EX
 gold = Fore.YELLOW
 yellow = Fore.LIGHTYELLOW_EX
+green = Fore.GREEN
 cyan = Fore.LIGHTCYAN_EX
 blue = Fore.LIGHTBLUE_EX
 pink = Fore.LIGHTMAGENTA_EX
+magenta = Fore.MAGENTA
 white = Fore.LIGHTWHITE_EX
 bold = Style.BRIGHT
 rst = Style.RESET_ALL
@@ -61,13 +63,13 @@ inEdges = [
     ("Lobby", "Shop"),
     ("Lobby", "Main Stair"),
     ("Living Room", "Main Stair"),
-    ("Main Stair", "Café"),
-    ("Café", "Garden"),
+    ("Main Stair", "Cafe"),
+    ("Cafe", "Garden"),
 ]
 graph = la.plotGraph(
     edges=inEdges, title='Museum', figName='ch1_graph', nodeSize=1200, plotFig=inPlotGraph
 )
-rooms = graph.nodes
+rooms = list(graph.nodes)
 """
 Random walk:
 
@@ -121,14 +123,14 @@ la.showVector(array=[x0], idx='Start Condition', col=rooms,
 And now suppose that everyone leaves the room they are in, choosing one of the exits at 
 random. To find out how many of them end up in the Lobby, we can multiply row0 by x
 """
-index = 0
-label = list(rooms)[index]
-row0 = transitionMatrix[index]
+selRoom = 'Shop'
+selRoomIdx = rooms.index(selRoom)
+row0 = transitionMatrix[selRoomIdx]
 product = x0 * row0 # Multiply arrays
 nMigrants = round(product.sum(), roundVal)
-la.showVector(array=[product], idx=[label], col=rooms,
-              label=f'x0 * {label}', pSpace=False)
-print(f'* A total of {red}{nMigrants:,}{rst} people have moved to the {label}')
+la.showVector(array=[product], idx=[selRoom], col=rooms,
+              label=f'x0 * {selRoom}', pSpace=False)
+print(f'* A total of {red}{nMigrants:,}{rst} people have moved to the {selRoom}')
 """
 The sum of elementwise products is an “inner product”, more often called a dot product 
 because the operator used to denote it is a dot.
@@ -192,12 +194,38 @@ all of the eigenvectors.
 """
 from scipy.linalg import eig
 vals, vecs = eig(transitionMatrix)
-la.showVector(array=[vals], col=rooms, label='Eigenvalues', pSpace=False)
-la.showMatrix(matrix=vecs, idx=rooms, col=rooms, label='Eigenvectors', pHeader=False)
 """
 The result is a one-dimensional array of eigenvalues and a two dimensional array of 
 eigenvectors. In this example, there are six eigenvalues.
-
-
 """
+la.showVector(array=[vals], col=rooms, label='Eigenvalues', pSpace=False)
+"""
+In general, the eigenvalues of a matrix can be complex numbers, but in this example the 
+imaginary parts are all 0, that is, the eigenvalues are all real. 
+We can use the abs function to get the real parts.
+"""
+la.showVector(array=[abs(vals)], col=rooms, label='Eigenvalues', label2='Absolute Values',
+              pHeader=False)
+"""
+The eigenvector we found by repeated multiplication is the one with eigenvalue 1.
+We can get the corresponding eigenvector by selecting the first column from vecs
+"""
+la.showMatrix(matrix=vecs, idx=rooms, col=rooms, label='Eigenvectors',
+              pHeader=False, pSpace=False)
+vec = vecs[:, selRoomIdx]
+la.showVector(array=[vec], vector=selRoom, idx=rooms, col=rooms,
+              label=f'Eigenvector', label2=selRoom, pSpace=False, pHeader=False)
+"""
+The Lobby vector doesnt look like the vector we found with repeated multiplication, but 
+if we divide through so the elements add up to 1, we’ll see that it is.
+"""
+vec = vec / vec.sum()
+la.showVector(array=[vec], idx=selRoom, col=rooms, label=f'Eigenvector',
+              label2=f'{selRoom} Normalized', pSpace=False, pHeader=False)
+print(f'Compare {pink}{selRoom} Normalized{rst} to {pink}Simulate Random Walk{rst}:\n'
+      f'\tnp.allclose(vec, xFinalProb) = {red}{np.allclose(vec, xFinalProb)}{rst}\n')
+print(f'If {red}True{rst}, we have found an eigenvector!\n')
 
+lam = vals[selRoomIdx].real
+print(lam)
+print(np.allclose(transitionMatrix @ vec, lam * vec))

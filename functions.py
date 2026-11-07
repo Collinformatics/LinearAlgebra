@@ -24,12 +24,6 @@ white = Fore.LIGHTWHITE_EX
 bold = Style.BRIGHT
 rst = Style.RESET_ALL
 
-# Set options
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_rows', 10)
-pd.set_option('display.width', 1000)
-pd.set_option('display.float_format', '{:,.3f}'.format)
-
 # GPU Usage
 # print(f'Jax Device: {jax.default_backend()}')
 
@@ -74,6 +68,8 @@ def getAxisTicks(values, largeValues=True, customSteps=None):
 class LinearAlgebra:
     def __init__(self):
         self.printN = 10
+        self.roundVal = 3
+        self.rstFloat = False
 
         # Params: Figures
         self.figDir = 'Figures'
@@ -85,9 +81,24 @@ class LinearAlgebra:
         self.lineThickness = 1.5
         self.tickLength = 4
         self.figureResolution = 600
-
+        
         if not os.path.exists(self.figDir):
             os.makedirs(self.figDir, exist_ok=True)
+
+        # Set options
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.max_rows', 10)
+        pd.set_option('display.width', 1000)
+        self.formatFloat()
+
+
+    def formatFloat(self, sciNotation=False):
+        if sciNotation:
+            pd.options.display.float_format = lambda x: f'{x:,.{self.roundVal}e}'
+            self.rstFloat = True
+        elif self.rstFloat:
+            pd.options.display.float_format = lambda x: f'{x:,.{self.roundVal}f}'
+            self.rstFloat = False
 
 
     @staticmethod
@@ -114,8 +125,12 @@ class LinearAlgebra:
             print(f'{green}{label}{rst}: {pink}{label2}{rst}')
         else:
             print(f'{green}{label}{rst}:')
-        print(pd.DataFrame(matrix, index=idx, columns=col))
-        print()
+        df = pd.DataFrame(matrix, index=idx, columns=col)
+        print(f'Min: {abs(df.loc[:,:].min(axis=None))}')
+        if abs(df.loc[:,:].min(axis=None)) > 10**3:
+            self.formatFloat(sciNotation=True)
+        print(f'{df}\n')
+        self.formatFloat()
         if pSpace:
             print()
 
@@ -131,10 +146,13 @@ class LinearAlgebra:
         else:
             print(f'{gold}{label}{rst}:')
         if vector:
-            print(pd.DataFrame(array, index=idx, columns=col).loc[[vector], :])
+            df = pd.DataFrame(array, index=idx, columns=col).loc[[vector], :]
         else:
-            print(pd.DataFrame(array, index=idx, columns=col))
-        print()
+            df = pd.DataFrame(array, index=idx, columns=col)
+        if abs(df.loc[:,:].min(axis=None)) > 10**3:
+            self.formatFloat(sciNotation=True)
+        print(f'{df}\n')
+        self.formatFloat()
         if pSpace:
             print()
 
@@ -153,7 +171,8 @@ class LinearAlgebra:
 
     def simRandomWalk(self, transMatrix, x0, steps, col):
         self.header()
-        print(f'Simulate Random Walk\nN Steps: {pink}{steps:,}{rst}\n')
+        print(f'Simulate Random Walk\n'
+              f'N Steps: {pink}{steps:,}{rst}\n')
         x = x0
         for _ in range(steps):
             x = transMatrix @ x # Matrix-vector multiplication
