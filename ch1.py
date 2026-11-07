@@ -232,6 +232,27 @@ la.showVector(array=[vec], idx=selRoom, col=rooms, label=f'Eigenvector',
               label2=f'{selRoom} Normalized', pSpace=False, pHeader=False)
 print(f'Compare {pink}{selRoom} Normalized{rst} to {pink}Simulate Random Walk{rst}:\n'
       f'\tIf {red}True{rst}, then eigenvector!\n'
-      f'\tnp.allclose(vec, xFinalProb) = {red}{np.allclose(vec, xFinalProb)}{rst}\n')
-
+      f'\tnp.allclose(vec, xFinalProb) = {red}{np.allclose(vec, xFinalProb)}{rst}\n\n')
+"""
+While we’re at it let’s confirm that the other eigenvectors also work.
+For example, here’s the second eigenvector.
+"""
+eigenvects = []
+for selRoomIdx in range(len(rooms)):
+    selRoom = rooms[selRoomIdx]
+    vec1 = vecs[:, selRoomIdx]
+    val1 = vals[selRoomIdx].real
+    eVect = np.allclose(transitionMatrix@vec1, val1*vec1)
+    eigenvects.append(eVect)
+    if selRoomIdx != 0:
+        header = True if selRoomIdx == 1 else False
+        la.showVector(array=[vec1], idx=selRoom, col=rooms, label=f'Additional Eigenvectors',
+                      label2=f'{selRoom}', pSpace=False, pHeader=header)
+        print(f'Eigenvalue (val1): {red}{round(val1, 3):,}{rst}\n')
+        print(f'Is {cyan}vec1{rst} and {magenta}eigenvector{rst} of the '
+              f'{magenta}transitionMatrix{rst}:')
+        print(f'\tnp.allclose(transitionMatrix@vec1, val1*vec1) = '
+              f'{red}{eVect}{rst}\n\n')
+la.showVector([eigenvects], idx='Eigenvectors', col=rooms,
+              label=f'Eigenvectors', pHeader=False)
 
