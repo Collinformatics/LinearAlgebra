@@ -119,6 +119,9 @@ class LinearAlgebra:
                    pHeader=False, pSpace=False, sumColumns=False):
         if pHeader:
             self.header()
+        # if not idx and len(matrix) > 1:
+        #     idx = [i for i in range(len(matrix))]
+        # else:
         idx = self.checkList(idx)
         col = self.checkList(col)
         if label2:

@@ -38,6 +38,66 @@ pd.set_option('display.float_format', '{:,.3f}'.format)
 
 roundVal = 2
 
+"""
+Notes:
+
+A = [[3, 1],          vals = [4, 2]
+     [1, 3]]          vecs = [[1,  1],
+                              [1, -1]]
+
+* Eigenvalues and Eigenvectors
+    Generally, "x" is an eigenvector of "M" if Mx = λx, 
+        where λ is an eigenvalue of "M".
+
+* Matrix Operations:
+    Operation	 Shapes	        Result	What it computes
+    A @ vecs	 (2,2) @ (2,2)	(2,2)	Each column of V transformed by A
+    vals * vecs	 (2,) × (2,2)	(2,2)	Each column of V scaled by its λ (broadcasting)
+    vals @ vecs	 (2,) @ (2,2)	(2,)	Weighted column-sum (unrelated)
+
+    A @ vecs == vals * vecs
+    
+* Operator: @
+    Matrix Multiplication:
+    - Vector times vector
+        Multiply row_A by col_vecs, then sum
+        A @ vecs =
+            result[0,0] = 3×1 + 1×1  = 4
+            result[0,1] = 3×1 + 1×(-1) = 2
+            result[1,0] = 1×1 + 3×1  = 4
+            result[1,1] = 1×1 + 3×(-1) = -2
+            = [[4,  2],
+               [4, -2]]
+
+        Operation	 Shapes	        Result
+        A @ vecs	 (2,2) @ (2,2)	(2,2)
+    
+    Dot Product:
+    - Scalar times vector
+        vals @ vecs =
+            result[0] = [4,2] · col0 of V = 4×1 + 2×1  = 6
+            result[1] = [4,2] · col1 of V = 4×1 + 2×(-1) = 2
+            = [6, 2]
+        
+        Operation	 Shapes	        Result
+        vals @ vecs	 (2,) @ (2,2)	(2,)
+
+
+* Operator: *
+    Each column scaled independently. No mixing.
+    
+    - A * vecs
+        col0    col1
+        row0  4×1     2×1
+        row1  4×1     2×(-1)
+        
+        = [[4,  2],
+           [4, -2]]
+
+
+"""
+
+
 # Initialize class
 la = LinearAlgebra()
 
@@ -274,6 +334,7 @@ We’ll use this function to add up the columns in an array. In NumPy, axis 0 is
 rows and axis 1 is across the columns, so calling sum with axis=1 adds up the columns.
 """
 la.showMatrix(matrix=vecs, idx=rooms, col=rooms, label='Eigenvectors', pHeader=True)
+la.showVector(array=[vals], col=rooms, label='Eigenvalues', pSpace=True)
 x0 = la.sumColumns(array=vecs, col=rooms, label='x0 = Eigenvectors.sum(axis=1)')
 """
 Noe let's multiply the sum of the Eigenvectors by the Transition Matrix
@@ -285,8 +346,22 @@ print(f'\nWe can also reach the same result by:\n'
       f'{magenta}Eigenvectors{rst}\n'
       f'* then {magenta}summing{rst} the columns')
 la.sumColumns(array=transitionMatrix@vecs, col=rooms,
-              label='TransitionMatrix @ Eigenvectors' )
+              label='x1 = TransitionMatrix @ Eigenvectors', pSpace=True)
 """
 The result is a weighted the sum of eigenvectors, where the weights are the eigenvalues, 
 which we can compute like this.
 """
+print(f'We can also use the {magenta}Eigenvalues{rst} to scale the '
+      f'{magenta}Eigenvectors{rst}.\n'
+      f'This is the "{cyan}λx{rst}" term of the equation:\n\t{cyan}Mx = λx{rst}\n')
+la.showMatrix(vals*vecs, idx=rooms, col=rooms, label='Eigenvalues * Eigenvectors')
+# print(f'Transition Matrix: {np.shape(transitionMatrix)}\n'
+#       f'Eigenvectors: {np.shape(vecs)}\n'
+#       f'Eigenvalues: {np.shape(vals)}\n')
+"""
+Operator: * = element-wise (Hadamard) multiplication.
+    A * B multiplies matching positions independently, no summation.
+"""
+x1 = la.sumColumns(vals*vecs, col=rooms, label='x1 = Eigenvalues * Eigenvectors')
+
+
