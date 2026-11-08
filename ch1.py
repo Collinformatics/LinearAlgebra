@@ -46,8 +46,12 @@ A = [[3, 1],          vals = [4, 2]
                               [1, -1]]
 
 * Eigenvalues and Eigenvectors
-    Generally, "x" is an eigenvector of "M" if Mx = λx, 
+    Generally, "x" is an eigenvector of "M" if Mx = λx,
         where λ is an eigenvalue of "M".
+    
+    The equation uses the following operators:
+        M @ x = λ * x
+
 
 * Matrix Operations:
     Operation	 Shapes	        Result	What it computes
@@ -56,7 +60,8 @@ A = [[3, 1],          vals = [4, 2]
     vals @ vecs	 (2,) @ (2,2)	(2,)	Weighted column-sum (unrelated)
 
     A @ vecs == vals * vecs
-    
+
+
 * Operator: @
     Matrix Multiplication:
     - Vector times vector
@@ -87,14 +92,12 @@ A = [[3, 1],          vals = [4, 2]
     Each column scaled independently. No mixing.
     
     - A * vecs
-        col0    col1
+              col0    col1
         row0  4×1     2×1
         row1  4×1     2×(-1)
         
         = [[4,  2],
            [4, -2]]
-
-
 """
 
 
@@ -233,7 +236,7 @@ print(f'Comparison: np.allclose(x, xFinalProb) = '
       f'\tTherefore {cyan}x{rst} is an {magenta}eigenvector{rst} of {cyan}M{rst}\n'
       f'\t* M is the transitionMatrix\n\n'
       f'\tGenerally, {cyan}x{rst} is an {magenta}eigenvector{rst} of {cyan}M{rst} '
-      f'when {cyan}Mx = λx{rst}\n'
+      f'when {cyan}M@x = λ*x{rst}\n'
       f'\t* Where {cyan}λ{rst} is the {magenta}eigenvalue{rst} of {cyan}M{rst}\n\n')
 """
 np.allclose(x1, x2):
@@ -276,7 +279,7 @@ la.showVector(array=[abs(vals)], col=rooms, label='Eigenvalues', label2='Absolut
 The eigenvector we found by repeated multiplication is the one with eigenvalue 1.
 We can get the corresponding eigenvector by selecting the first column from vecs
 """
-la.showMatrix(matrix=vecs, idx=rooms, col=rooms, label='Eigenvectors',
+la.showMatrix(array=vecs, idx=rooms, col=rooms, label='Eigenvectors',
               )
 vec = vecs[:, selRoomIdx]
 la.showVector(array=[vec], vector=selRoom, idx=rooms, col=rooms,
@@ -333,35 +336,51 @@ Now suppose we start with an initial vector that is the sum of all of the eigenv
 We’ll use this function to add up the columns in an array. In NumPy, axis 0 is down the 
 rows and axis 1 is across the columns, so calling sum with axis=1 adds up the columns.
 """
-la.showMatrix(matrix=vecs, idx=rooms, col=rooms, label='Eigenvectors', pHeader=True)
-la.showVector(array=[vals], col=rooms, label='Eigenvalues', pSpace=True)
+la.showMatrix(array=transitionMatrix, idx=rooms, col=rooms, label='Transition Matrix',
+              pHeader=True)
+la.sumColumns(array=transitionMatrix, col=rooms, label='Transition Matrix')
+la.showMatrix(array=vecs, idx=rooms, col=rooms, label='Eigenvectors')
+la.showVector(array=[vals], col=rooms, label='Eigenvalues')
+print(f'Transition Matrix: {np.shape(transitionMatrix)}\n'
+      f'Eigenvectors:      {np.shape(vecs)}\n'
+      f'Eigenvalues:       {np.shape(vals)}\n\n')
+print(f'Lets sum the {magenta}Eigenvectors{rst} and then multiply the '
+      f'{magenta}Transition Matrix{rst} by the sum {cyan}x0{rst}:')
 x0 = la.sumColumns(array=vecs, col=rooms, label='x0 = Eigenvectors.sum(axis=1)')
 """
 Noe let's multiply the sum of the Eigenvectors by the Transition Matrix
 """
 x1 = transitionMatrix @ x0
-la.showVector(array=[x1], idx='x1', col=rooms, label=f'TransitionMatrix @ x0')
+la.showVector(array=[x1], idx='x1', col=rooms, label=f'x1 = TransitionMatrix @ x0')
 print(f'\nWe can also reach the same result by:\n'
       f'* multiplying the {magenta}Transition Matrix{rst} by the '
       f'{magenta}Eigenvectors{rst}\n'
       f'* then {magenta}summing{rst} the columns')
 la.sumColumns(array=transitionMatrix@vecs, col=rooms,
-              label='x1 = TransitionMatrix @ Eigenvectors', pSpace=True)
+              label='x1 = TransitionMatrix @ Eigenvectors')
+print(f'The result is a weighted the sum of {magenta}eigenvectors{rst}, where the weights '
+      f'are the {magenta}eigenvalues{rst}, which we can compute like this:')
+la.sumColumns(array=vals*vecs, col=rooms, label='x1 = vals * vecs')
+
+
 """
-The result is a weighted the sum of eigenvectors, where the weights are the eigenvalues, 
-which we can compute like this.
+Misc:
 """
-print(f'We can also use the {magenta}Eigenvalues{rst} to scale the '
-      f'{magenta}Eigenvectors{rst}.\n'
-      f'This is the "{cyan}λx{rst}" term of the equation:\n\t{cyan}Mx = λx{rst}\n')
-la.showMatrix(vals*vecs, idx=rooms, col=rooms, label='Eigenvalues * Eigenvectors')
-# print(f'Transition Matrix: {np.shape(transitionMatrix)}\n'
-#       f'Eigenvectors: {np.shape(vecs)}\n'
-#       f'Eigenvalues: {np.shape(vals)}\n')
-"""
-Operator: * = element-wise (Hadamard) multiplication.
-    A * B multiplies matching positions independently, no summation.
-"""
-x1 = la.sumColumns(vals*vecs, col=rooms, label='x1 = Eigenvalues * Eigenvectors')
+# la.header()
+# print(f'We can also use the {magenta}Eigenvalues{rst} to scale the '
+#       f'{magenta}Eigenvectors{rst}.\n'
+#       f'This is the "{cyan}λx{rst}" term of the equation:\n\t{cyan}M@x = λ*x{rst}\n')
+# la.showMatrix(transitionMatrix@vecs, idx=rooms, col=rooms,
+#               label='transitionMatrix @ Eigenvectors')
+# """
+# Operator: * = element-wise (Hadamard) multiplication.
+#     A * B multiplies matching positions independently, no summation.
+# """
+# vv = vals*vecs
+# la.showMatrix(vv.real, idx=rooms, col=rooms, label='Eigenvalues * Eigenvectors',
+#               label2='Real Values')
+
+
+
 
 

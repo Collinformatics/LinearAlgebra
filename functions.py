@@ -115,12 +115,12 @@ class LinearAlgebra:
         return d
 
 
-    def showMatrix(self, matrix, idx='', col='', label='Matrix', label2='',
+    def showMatrix(self, array, idx='', col='', label='Matrix', label2='',
                    pHeader=False, pSpace=False, sumColumns=False):
         if pHeader:
             self.header()
-        # if not idx and len(matrix) > 1:
-        #     idx = [i for i in range(len(matrix))]
+        # if not idx and len(array) > 1:
+        #     idx = [i for i in range(len(array))]
         # else:
         idx = self.checkList(idx)
         col = self.checkList(col)
@@ -128,7 +128,7 @@ class LinearAlgebra:
             print(f'{green}{label}{rst}: {pink}{label2}{rst}')
         else:
             print(f'{green}{label}{rst}:')
-        df = pd.DataFrame(matrix, index=idx, columns=col)
+        df = pd.DataFrame(array, index=idx, columns=col)
         if abs(df.loc[:,:].min(axis=None)) > 10**3:
             self.formatFloat(sciNotation=True)
         if sumColumns:
@@ -172,14 +172,14 @@ class LinearAlgebra:
 
     def adjacencyMatrix(self, G, pHeader=False):
         array = nx.to_numpy_array(G).astype(int)
-        self.showMatrix(matrix=array, idx=G.nodes, col=G.nodes, label='Adjacency Matrix',
+        self.showMatrix(array=array, idx=G.nodes, col=G.nodes, label='Adjacency Matrix',
                         pHeader=pHeader)
         return array
 
 
     def transitionMatrix(self, matrix, idx, col, pHeader=False, pSpace=False):
         m = matrix / matrix.sum(axis=0, keepdims=True)
-        self.showMatrix(matrix=m, idx=idx, col=col, label='Transition Matrix',
+        self.showMatrix(array=m, idx=idx, col=col, label='Transition Matrix',
                         pHeader=pHeader, pSpace=pSpace)
         return m
 
