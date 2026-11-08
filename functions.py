@@ -116,7 +116,7 @@ class LinearAlgebra:
 
 
     def showMatrix(self, matrix, idx='', col='', label='Matrix', label2='',
-                   pSpace=True, pHeader=True, sumColumns=False):
+                   pHeader=False, pSpace=False, sumColumns=False):
         if pHeader:
             self.header()
         idx = self.checkList(idx)
@@ -137,7 +137,7 @@ class LinearAlgebra:
 
 
     def showVector(self, array, idx='', col='', vector=False, label='Vector',
-                   label2='', pSpace=True, pHeader=True):
+                   label2='', pHeader=False, pSpace=False):
         if pHeader:
             self.header()
         idx = self.checkList(idx)
@@ -158,22 +158,24 @@ class LinearAlgebra:
             print()
 
 
-    def sumColumns(self, array, col, label='', pHeader=True, pSpace=True):
+    def sumColumns(self, array, col, label='', pHeader=False, pSpace=False):
         s = list(array.sum(axis=1))
         self.showVector(array=[s], idx='Sum', col=col, label='Sum Columns', label2=label,
                         pHeader=pHeader, pSpace=pSpace)
         return s
 
 
-    def adjacencyMatrix(self, G):
+    def adjacencyMatrix(self, G, pHeader=False):
         array = nx.to_numpy_array(G).astype(int)
-        self.showMatrix(matrix=array, idx=G.nodes, col=G.nodes, label='Adjacency Matrix')
+        self.showMatrix(matrix=array, idx=G.nodes, col=G.nodes, label='Adjacency Matrix',
+                        pHeader=pHeader)
         return array
 
 
-    def transitionMatrix(self, matrix, idx, col):
+    def transitionMatrix(self, matrix, idx, col, pHeader=False, pSpace=False):
         m = matrix / matrix.sum(axis=0, keepdims=True)
-        self.showMatrix(matrix=m, idx=idx, col=col, label='Transition Matrix')
+        self.showMatrix(matrix=m, idx=idx, col=col, label='Transition Matrix',
+                        pHeader=pHeader, pSpace=pSpace)
         return m
 
 
@@ -195,7 +197,10 @@ class LinearAlgebra:
         return x, prob
 
 
-    def randomWalk(self, G, start, iterations=1000):
+    def randomWalk(self, G, start, iterations=1000, pHeader=False,
+                   pSpace=False):
+        if pHeader:
+            self.header()
         counter = Counter()
         node = start
 
@@ -207,7 +212,7 @@ class LinearAlgebra:
             counter[key] /= iterations
 
         self.showVector(array=[counter.values()], idx='Probability', col=G.nodes,
-                        label='Random Walk')
+                        label='Random Walk', pSpace=pSpace)
 
 
     def saveFig(self, plot, figureName, fig=None):

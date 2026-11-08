@@ -77,7 +77,7 @@ Now we will simulate a random walk through the museum.
 We'll use a Counter to keep track of the number of times each room is visited. 
 Then divide through by the number of iterations, so the values in the Counter sum to one.
 """
-la.randomWalk(G=graph, start='Lobby')
+la.randomWalk(G=graph, start='Lobby', pHeader=True, pSpace=True)
 
 
 """
@@ -86,7 +86,7 @@ la.randomWalk(G=graph, start='Lobby')
 Each element is either 1 to indicate that there is an edge between two nodes or 0 to 
 indicate that there is not.
 """
-adjacencyMatrix = la.adjacencyMatrix(G=graph)
+adjacencyMatrix = la.adjacencyMatrix(G=graph, pHeader=True)
 """
 Transition Matrix:
 
@@ -106,7 +106,8 @@ probability is 0.333.
 transitionMatrix = la.transitionMatrix(
     matrix=adjacencyMatrix, idx=rooms, col=rooms
 )
-la.showVector(array=transitionMatrix, vector='Lobby', idx=rooms, col=rooms)
+la.showVector(array=transitionMatrix, vector='Lobby', label2='Lobby',
+              idx=rooms, col=rooms, pSpace=True)
 
 
 """
@@ -118,7 +119,7 @@ this hypothetical starting condition.
 N = len(graph)
 x0 = np.full(N, 100)
 la.showVector(array=[x0], idx='Start Condition', col=rooms,
-              label='Museum Migration (x0)')
+              label='Museum Migration (x0)', pHeader=True)
 """
 And now suppose that everyone leaves the room they are in, choosing one of the exits at 
 random. To find out how many of them end up in the Lobby, we can multiply row0 by x
@@ -129,7 +130,7 @@ row0 = transitionMatrix[selRoomIdx]
 product = x0 * row0 # Multiply arrays
 nMigrants = round(product.sum(), roundVal)
 la.showVector(array=[product], idx=[selRoom], col=rooms,
-              label=f'x0 * {selRoom}', pSpace=False)
+              label=f'x0 * {selRoom}')
 print(f'* A total of {red}{nMigrants:,}{rst} people have moved to the {selRoom}')
 """
 The sum of elementwise products is an “inner product”, more often called a dot product 
@@ -144,7 +145,7 @@ THe @ operator also allows for multiplying a matrix and vector
 """
 x1 = transitionMatrix @ x0
 la.showVector([x1], idx='Migration', col=rooms, label='Museum Migration (x1)',
-              label2='x1 = Matrix @ Vector = transitionMatrix @ x0', pSpace=False)
+              label2='x1 = Matrix @ Vector = transitionMatrix @ x0')
 print(f'Total people: {red}{round(sum(x1), roundVal):,}{rst}\n\n')
 """
 We can use this to simulate a random walk for n number of steps
@@ -162,7 +163,7 @@ let’s see what happens if we multiply the result by M one more time.
 """
 x = transitionMatrix @ xFinalProb
 la.showVector(array=[x], idx='Migration', col=rooms, label='Probability',
-              label2='transitionMatrix @ xFinalProb = x', pSpace=False)
+              label2='transitionMatrix @ xFinalProb = x', pHeader=True)
 """
 Lets compare this vector to xFinalProb
 """
@@ -204,23 +205,22 @@ vals, vecs = eig(transitionMatrix)
 The result is a one-dimensional array of eigenvalues and a two dimensional array of 
 eigenvectors. In this example, there are six eigenvalues.
 """
-la.showVector(array=[vals], col=rooms, label='Eigenvalues', pSpace=False)
+la.showVector(array=[vals], col=rooms, label='Eigenvalues', pHeader=True)
 """
 In general, the eigenvalues of a matrix can be complex numbers, but in this example the 
 imaginary parts are all 0, that is, the eigenvalues are all real. 
 We can use the abs function to get the real parts.
 """
-la.showVector(array=[abs(vals)], col=rooms, label='Eigenvalues', label2='Absolute Values',
-              pHeader=False)
+la.showVector(array=[abs(vals)], col=rooms, label='Eigenvalues', label2='Absolute Values')
 """
 The eigenvector we found by repeated multiplication is the one with eigenvalue 1.
 We can get the corresponding eigenvector by selecting the first column from vecs
 """
 la.showMatrix(matrix=vecs, idx=rooms, col=rooms, label='Eigenvectors',
-              pHeader=False, pSpace=False)
+              )
 vec = vecs[:, selRoomIdx]
 la.showVector(array=[vec], vector=selRoom, idx=rooms, col=rooms,
-              label=f'Eigenvector', label2=selRoom, pSpace=False, pHeader=False)
+              label=f'Eigenvector', label2=selRoom)
 """
 The Lobby vector doesnt look like the vector we found with repeated multiplication, but 
 if we divide through so the elements add up to 1, we’ll see that it is.
@@ -229,7 +229,7 @@ s = vec.sum()
 print(f'Vector sum: {s}\n')
 vec = vec / s
 la.showVector(array=[vec], idx=selRoom, col=rooms, label=f'Eigenvector',
-              label2=f'{selRoom} Normalized', pSpace=False, pHeader=False)
+              label2=f'{selRoom} Normalized')
 print(f'Compare {pink}{selRoom} Normalized{rst} to {pink}Simulate Random Walk{rst}:\n'
       f'\tIf {red}True{rst}, then eigenvector!\n'
       f'\tnp.allclose(vec, xFinalProb) = {red}{np.allclose(vec, xFinalProb)}{rst}\n\n')
@@ -247,14 +247,13 @@ For example, here’s the second eigenvector.
 #     if idx != 0:
 #         header = True if idx == 1 else False
 #         la.showVector(array=[vecN], idx=r, col=rooms, label=f'Additional Eigenvectors',
-#                       label2=f'{r}', pSpace=False, pHeader=header)
+#                       label2=f'{r}'pHeader=header)
 #         print(f'Eigenvalue (valN): {red}{round(valN, 3):,}{rst}\n')
 #         print(f'Is {cyan}vec{idx}{rst} and {magenta}eigenvector{rst} of the '
 #               f'{magenta}transitionMatrix{rst}:')
 #         print(f'\tnp.allclose(transitionMatrix@vecN, valN*vecN) = '
 #               f'{red}{isEV}{rst}\n\n')
-# la.showVector([eigenvects], idx='Eigenvectors', col=rooms,
-#               label=f'Eigenvectors', pHeader=False)
+# la.showVector([eigenvects], idx='Eigenvectors', col=rooms, label=f'Eigenvectors')
 
 
 """
@@ -274,8 +273,11 @@ Now suppose we start with an initial vector that is the sum of all of the eigenv
 We’ll use this function to add up the columns in an array. In NumPy, axis 0 is down the 
 rows and axis 1 is across the columns, so calling sum with axis=1 adds up the columns.
 """
-la.showMatrix(matrix=vecs, idx=rooms, col=rooms, label='Eigenvectors',
-              pSpace=False, sumColumns=False)
-x0 = la.sumColumns(array=vecs, col=rooms, label='Eigenvectors', pHeader=False)
-
-
+la.showMatrix(matrix=vecs, idx=rooms, col=rooms, label='Eigenvectors', pHeader=True)
+x0 = la.sumColumns(array=vecs, col=rooms, label='Eigenvectors (x0)')
+"""
+Noe let's multiply the sum of the Eigenvectors by the Transition Matrix
+"""
+x1 = transitionMatrix @ x0
+la.showVector(array=[x1], idx='x1', col=rooms, label=f'TransitionMatrix @ x0')
+la.sumColumns(array=transitionMatrix@vecs, col=rooms, label='TransitionMatrix @ vecs' )
