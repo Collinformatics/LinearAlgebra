@@ -237,22 +237,45 @@ print(f'Compare {pink}{selRoom} Normalized{rst} to {pink}Simulate Random Walk{rs
 While we’re at it let’s confirm that the other eigenvectors also work.
 For example, here’s the second eigenvector.
 """
-eigenvects = []
-for selRoomIdx in range(len(rooms)):
-    selRoom = rooms[selRoomIdx]
-    vec1 = vecs[:, selRoomIdx]
-    val1 = vals[selRoomIdx].real
-    eVect = np.allclose(transitionMatrix@vec1, val1*vec1)
-    eigenvects.append(eVect)
-    if selRoomIdx != 0:
-        header = True if selRoomIdx == 1 else False
-        la.showVector(array=[vec1], idx=selRoom, col=rooms, label=f'Additional Eigenvectors',
-                      label2=f'{selRoom}', pSpace=False, pHeader=header)
-        print(f'Eigenvalue (val1): {red}{round(val1, 3):,}{rst}\n')
-        print(f'Is {cyan}vec1{rst} and {magenta}eigenvector{rst} of the '
-              f'{magenta}transitionMatrix{rst}:')
-        print(f'\tnp.allclose(transitionMatrix@vec1, val1*vec1) = '
-              f'{red}{eVect}{rst}\n\n')
-la.showVector([eigenvects], idx='Eigenvectors', col=rooms,
-              label=f'Eigenvectors', pHeader=False)
+# eigenvects = []
+# for idx in range(len(rooms)):
+#     r = rooms[idx]
+#     vecN = vecs[:, idx]
+#     valN = vals[idx].real
+#     isEV = np.allclose(transitionMatrix@vecN, valN*vecN)
+#     eigenvects.append(isEV)
+#     if idx != 0:
+#         header = True if idx == 1 else False
+#         la.showVector(array=[vecN], idx=r, col=rooms, label=f'Additional Eigenvectors',
+#                       label2=f'{r}', pSpace=False, pHeader=header)
+#         print(f'Eigenvalue (valN): {red}{round(valN, 3):,}{rst}\n')
+#         print(f'Is {cyan}vec{idx}{rst} and {magenta}eigenvector{rst} of the '
+#               f'{magenta}transitionMatrix{rst}:')
+#         print(f'\tnp.allclose(transitionMatrix@vecN, valN*vecN) = '
+#               f'{red}{isEV}{rst}\n\n')
+# la.showVector([eigenvects], idx='Eigenvectors', col=rooms,
+#               label=f'Eigenvectors', pHeader=False)
+
+
+"""
+1.5 Linearity:
+
+Since there are multiple eigenvectors for this transition matrix, you might wonder why we 
+focused on the first one and ignored the rest. The reason is that the eigenvector that 
+corresponds to eigenvalue 1 represents a stationary point of M.
+That is, a distribution of probability across the nodes that is unchanged when we multiply 
+by the transition matrix.
+
+The other eigenvalues are all less than 1, which means that if we start with one of the 
+other eigenvectors and multiply by M repeatedly, the result gets smaller and smaller, 
+converging toward 0.
+
+Now suppose we start with an initial vector that is the sum of all of the eigenvectors. 
+We’ll use this function to add up the columns in an array. In NumPy, axis 0 is down the 
+rows and axis 1 is across the columns, so calling sum with axis=1 adds up the columns.
+"""
+la.showMatrix(matrix=vecs, idx=rooms, col=rooms, label='Eigenvectors',
+              pSpace=False, sumColumns=False)
+x0 = la.sumColumns(array=vecs, col=rooms, label='Eigenvectors', pHeader=False)
+
 

@@ -116,7 +116,7 @@ class LinearAlgebra:
 
 
     def showMatrix(self, matrix, idx='', col='', label='Matrix', label2='',
-                   pSpace=True, pHeader=True):
+                   pSpace=True, pHeader=True, sumColumns=False):
         if pHeader:
             self.header()
         idx = self.checkList(idx)
@@ -128,6 +128,8 @@ class LinearAlgebra:
         df = pd.DataFrame(matrix, index=idx, columns=col)
         if abs(df.loc[:,:].min(axis=None)) > 10**3:
             self.formatFloat(sciNotation=True)
+        if sumColumns:
+            df.loc['** Sum **', :] = list(df.sum(axis=1))
         print(f'{df}\n')
         self.formatFloat()
         if pSpace:
@@ -154,6 +156,13 @@ class LinearAlgebra:
         self.formatFloat()
         if pSpace:
             print()
+
+
+    def sumColumns(self, array, col, label='', pHeader=True, pSpace=True):
+        s = list(array.sum(axis=1))
+        self.showVector(array=[s], idx='Sum', col=col, label='Sum Columns', label2=label,
+                        pHeader=pHeader, pSpace=pSpace)
+        return s
 
 
     def adjacencyMatrix(self, G):
