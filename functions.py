@@ -158,10 +158,12 @@ class LinearAlgebra:
             print()
 
 
-    def sumColumns(self, array, col, label='', pHeader=False, pSpace=False):
+    def sumColumns(self, array, col, label='', pData=True, pHeader=False,
+                   pSpace=False):
         s = list(array.sum(axis=1))
-        self.showVector(array=[s], idx='Sum', col=col, label='Sum Columns', label2=label,
-                        pHeader=pHeader, pSpace=pSpace)
+        if pData:
+            self.showVector(array=[s], idx='Sum', col=col, label='Sum Columns',
+                            label2=label, pHeader=pHeader, pSpace=pSpace)
         return s
 
 

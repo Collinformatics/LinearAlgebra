@@ -274,10 +274,19 @@ We’ll use this function to add up the columns in an array. In NumPy, axis 0 is
 rows and axis 1 is across the columns, so calling sum with axis=1 adds up the columns.
 """
 la.showMatrix(matrix=vecs, idx=rooms, col=rooms, label='Eigenvectors', pHeader=True)
-x0 = la.sumColumns(array=vecs, col=rooms, label='Eigenvectors (x0)')
+x0 = la.sumColumns(array=vecs, col=rooms, label='x0 = Eigenvectors.sum(axis=1)')
 """
 Noe let's multiply the sum of the Eigenvectors by the Transition Matrix
 """
 x1 = transitionMatrix @ x0
 la.showVector(array=[x1], idx='x1', col=rooms, label=f'TransitionMatrix @ x0')
-la.sumColumns(array=transitionMatrix@vecs, col=rooms, label='TransitionMatrix @ vecs' )
+print(f'\nWe can also reach the same result by:\n'
+      f'* multiplying the {magenta}Transition Matrix{rst} by the '
+      f'{magenta}Eigenvectors{rst}\n'
+      f'* then {magenta}summing{rst} the columns')
+la.sumColumns(array=transitionMatrix@vecs, col=rooms,
+              label='TransitionMatrix @ Eigenvectors' )
+"""
+The result is a weighted the sum of eigenvectors, where the weights are the eigenvalues, 
+which we can compute like this.
+"""
