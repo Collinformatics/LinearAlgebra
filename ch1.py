@@ -17,6 +17,7 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 import sys
+import tarfile
 from utils import decorate
 from urllib.parse import unquote
 
@@ -411,8 +412,7 @@ For this exercise, you'll need to download the following dataset:
     https://snap.stanford.edu/data/wikispeedia/wikispeedia_paths-and-graph.tar.gz
 """
 la.header()
-print('PageRank')
-import tarfile
+print('PageRank:\n')
 path = os.path.join('Data', 'wikispeedia_paths-and-graph.tar.gz')
 print(f'Loading file:\n\t{green}{path}{rst}\n')
 with tarfile.open(path, 'r:gz') as tar:
@@ -438,4 +438,52 @@ To check for sink nodes, we can use the out_degree function, which computes the 
 edges that go out from each node.
 """
 nodesSink = [unquote(node) for node, degree in GWiki.out_degree() if degree == 0]
-print(f'Sink Nodes: {grey}{", ".join(nodesSink)}{rst}\n')
+print(f'\nSink Nodes: {grey}{", ".join(nodesSink)}{rst}')
+print(f'\tA "{grey}Sink Node{rst}" is a webpage with no link, this acts as a dead end.\n'
+      f'\tIf a random walk enters the sink, it won\'t be able to leave.\n')
+print(f'We\'ll deal with the "Sink Nodes" by occasionally "teleporting" to other nodes.\n'
+      f'By mixing up from choosing a random link, and teleporting to other nodes we will '
+      f'be adding randomness to the random walk.')
+"""
+To handle these sink nodes, we’ll add more randomness to the random walk. Instead of 
+choosing a random link at every step, we will sometimes “teleport” by choosing another 
+node entirely at random.
+
+First, let’s get the adjacency matrix from the graph.
+"""
+A = nx.to_numpy_array(GWiki)
+"""
+The row sum of a sink node is 0
+"""
+rowSums = A.sum(axis=1)
+nodesSink = np.where(rowSums == 0)[0]
+print(f'\nSink Nodes (N={red}{len(nodesSink):,}{rst}):\n'
+      f'{grey}{pd.DataFrame(nodesSink).T}{rst}')
+"""
+If we get to a sink node, we have to choose a new node at random, so we’ll make a vector 
+with an equal probability for every node.
+"""
+n = len(A)
+p = np.repeat(1 / n, n)
+print(f'Sink Node probability: {p[0]}')
+print(f'\tWe\'ll replace the "Sink Nodes" rows with the teleport probabilities\n'
+      f'\tThis allows for a equal probability to jump to any other node..')
+for node in nodesSink:
+    A[node] = p
+"""
+Now we can compute the transition matrix as we did before.
+"""
+M = A / A.sum(axis=1, keepdims=True)
+"""
+At every step of a PageRank random walk, there is some probability of teleporting 
+regardless of whether we are in a sink node or not. 
+
+A parameter called alpha specifies the probability of not teleporting.
+    The default value is 0.85, which means we teleport 15% of the time.
+
+To make a transition matrix with teleporting, we’ll compute a weighted sum of the 
+transition matrix "M" and the teleport vector, "p".
+"""
+alpha = 0.85
+GM = alpha * M + (1 - alpha) * p
+print(GM.shape)
