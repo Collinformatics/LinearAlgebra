@@ -467,7 +467,7 @@ n = len(A)
 p = np.repeat(1 / n, n)
 print(f'Sink Node probability: {p[0]}')
 print(f'\tWe\'ll replace the "Sink Nodes" rows with the teleport probabilities\n'
-      f'\tThis allows for a equal probability to jump to any other node..')
+      f'\tThis allows for a equal probability to jump to any other node.\n')
 for node in nodesSink:
     A[node] = p
 """
@@ -484,6 +484,17 @@ A parameter called alpha specifies the probability of not teleporting.
 To make a transition matrix with teleporting, we’ll compute a weighted sum of the 
 transition matrix "M" and the teleport vector, "p".
 """
+print(f'During a PageRank random walk there is a probability of teleporting regardless '
+      f'if we are in a sink or not.\n'
+      f'\tThe {cyan}Alpha{rst} param specifies this probability.\n'
+      f'\tWhen {cyan}Alpha{rst}={red}0.85{rst}, {cyan}prob_teleport{rst}={red}15%{rst}\n')
 alpha = 0.85
 GM = alpha * M + (1 - alpha) * p
-print(GM.shape)
+print(f'GM.shape: {red}{GM.shape}{rst}\n')
+"""
+The result is called a Google matrix. 
+NetworkX provides a function that computes it (with a few more options).
+"""
+GM_nx = nx.google_matrix(GWiki, alpha=alpha)
+print(f'Comparison: np.allclose(GM, GM_nx): {red}{np.allclose(GM, GM_nx)}{rst}\n')
+
