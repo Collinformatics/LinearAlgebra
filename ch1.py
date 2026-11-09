@@ -1,6 +1,7 @@
 """
 1. The Power of Linear Algebra
 
+
 To demonstrate, this chapter introduces vectors, matrices, and matrix-vector
 multiplication.
 
@@ -8,13 +9,16 @@ We’ll use these tools to simulate a random walk in a network, and we’ll impl
 PageRank algorithm Google used to revolutionize web search. Along the way, we’ll learn
 about eigenvectors, one of the most powerful ideas in linear algebra.
 """
+import os.path
 
 from colorama import Fore, Style
 from functions import LinearAlgebra
+import networkx as nx
 import numpy as np
 import pandas as pd
 import sys
 from utils import decorate
+from urllib.parse import unquote
 
 
 # Define colors
@@ -27,6 +31,7 @@ blue = Fore.BLUE
 pink = Fore.LIGHTMAGENTA_EX
 magenta = Fore.MAGENTA
 white = Fore.LIGHTWHITE_EX
+grey = Fore.WHITE
 bold = Style.BRIGHT
 rst = Style.RESET_ALL
 
@@ -108,6 +113,7 @@ la = LinearAlgebra()
 """
 1.1. A Day at the Museum:
 
+
 Suppose you are meeting a friend at the Isabella Stewart Gardner Museum in Boston. You 
 have not agreed on a meeting place – and let’s assume your cell phone is dead. If you are 
 familiar with the layout of the museum, you might be able to make an intelligent guess 
@@ -146,6 +152,7 @@ la.randomWalk(G=graph, start='Lobby', pHeader=True, pSpace=True)
 """
 1.2 Adjacency Matrix:
 
+
 Each element is either 1 to indicate that there is an edge between two nodes or 0 to 
 indicate that there is not.
 """
@@ -175,6 +182,7 @@ la.showVector(array=transitionMatrix, vector='Lobby', label2='Lobby',
 
 """
 1.3 Dot Product:
+
 
 Now suppose there are 100 people in every room. We can create an array that represents 
 this hypothetical starting condition.
@@ -220,6 +228,7 @@ xFinal, xFinalProb = la.simRandomWalk(
 
 """
 1.4 Eigenvectors:
+
 
 In the previous section, we simulated a random walk by multiplying by M 100 times. Now 
 let’s see what happens if we multiply the result by M one more time.
@@ -322,6 +331,7 @@ For example, here’s the second eigenvector.
 """
 1.5 Linearity:
 
+
 Since there are multiple eigenvectors for this transition matrix, you might wonder why we 
 focused on the first one and ignored the rest. The reason is that the eigenvector that 
 corresponds to eigenvalue 1 represents a stationary point of M.
@@ -355,14 +365,12 @@ la.showVector(array=[x1], idx='x1', col=rooms, label=f'x1 = TransitionMatrix @ x
 print(f'\nWe can also reach the same result by:\n'
       f'* multiplying the {magenta}Transition Matrix{rst} by the '
       f'{magenta}Eigenvectors{rst}\n'
-      f'* then {magenta}summing{rst} the columns')
+      f'* then {magenta}summing{rst} the columns\n')
 la.sumColumns(array=transitionMatrix@vecs, col=rooms,
               label='x1 = TransitionMatrix @ Eigenvectors')
 print(f'The result is a weighted the sum of {magenta}eigenvectors{rst}, where the weights '
       f'are the {magenta}eigenvalues{rst}, which we can compute like this:')
-la.sumColumns(array=vals*vecs, col=rooms, label='x1 = vals * vecs')
-
-
+la.sumColumns(array=vals*vecs, col=rooms, label='x1 = vals * vecs', pSpace=True)
 """
 Misc:
 """
@@ -381,6 +389,53 @@ Misc:
 #               label2='Real Values')
 
 
+"""
+1.6 PageRank:
 
 
+The algorithm we used to find a friend at the museum is very close to PageRank, the 
+algorithm originally used by Google to quantify the importance of web pages. It works by 
+making a graph where each node is a web page and each edge represents a link. 
+If a page contains a link to another page, the graph contains an edge between the 
+corresponding nodes.
 
+In the museum graph, the edges are undirected – that is, if there is a connection from 
+room A to room B, there is also a connection from B to A. There are no one-way doors.
+
+In the web graph, the edges are directed – if there is a link from page A to page B, 
+there is not necessarily a link from B to A.
+
+As an example, we’ll use a dataset of Wikipedia pages collected as part of a research 
+project and made available in the Stanford Large Network Dataset Collection.
+For this exercise, you'll need to download the following dataset:
+    https://snap.stanford.edu/data/wikispeedia/wikispeedia_paths-and-graph.tar.gz
+"""
+la.header()
+print('PageRank')
+import tarfile
+path = os.path.join('Data', 'wikispeedia_paths-and-graph.tar.gz')
+print(f'Loading file:\n\t{green}{path}{rst}\n')
+with tarfile.open(path, 'r:gz') as tar:
+    file = tar.getmember('wikispeedia_paths-and-graph/links.tsv')
+    f = tar.extractfile(file)
+    wikiLinks = pd.read_csv(f, sep='\t', names=['source', 'target'], skiprows=12)
+sNum = 5
+print(f'Wiki: Sample number {sNum}\n{wikiLinks.sample(sNum)}\n')
+"""
+We can use the NetworkX function from_pandas_edgelist to make a graph.
+The create_using keyword specifies that we want a directed graph, that is, one that keeps 
+track of the direction of the edges.
+"""
+GWiki = nx.from_pandas_edgelist(wikiLinks, create_using=nx.DiGraph)
+print(f'N Nodes: {red}{GWiki.number_of_nodes():,}{rst}\n'
+      f'N Edges: {red}{GWiki.number_of_edges():,}{rst}')
+"""
+One of the challenges of working with a directed graph is that it might contain sink 
+nodes. For example, if there is a page with no links, it acts like a dead end, if a random 
+walk enters a sink node, it can’t leave.
+
+To check for sink nodes, we can use the out_degree function, which computes the number of 
+edges that go out from each node.
+"""
+nodesSink = [unquote(node) for node, degree in GWiki.out_degree() if degree == 0]
+print(f'Sink Nodes: {grey}{", ".join(nodesSink)}{rst}\n')
