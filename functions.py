@@ -69,7 +69,8 @@ class LinearAlgebra:
     def __init__(self):
         self.printN = 10
         self.roundVal = 3
-        self.rstFloat = False
+        self.headerLen = 80
+        self.rstFloat = True
 
         # Params: Figures
         self.figDir = 'Figures'
@@ -101,9 +102,16 @@ class LinearAlgebra:
             self.rstFloat = False
 
 
-    @staticmethod
-    def header(n=80):
-        print('='*n)
+    def header(self, txt=''):
+        if txt:
+            l = len(txt) + 2
+            b = int(np.floor((self.headerLen - l) / 2))
+            if l % 2 == 0:
+                print(f'{"=" * b} {txt} {"=" * b}')
+            else:
+                print(f'{"=" * b} {txt} {"=" * (b + 1)}')
+        else:
+            print('=' * self.headerLen)
 
 
     @staticmethod
