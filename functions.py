@@ -141,8 +141,8 @@ class LinearAlgebra:
 
     def getAxisTicks(self, values, largeValues=True, customSteps=None,
                      addZero=True):
-        values, padding, roundBy = self.formatList(values), 0.05, 5
-        maxVal, padAdj = int(max(values)), 10
+        values, roundBy = self.formatList(values), 5
+        maxVal, padding, padAdj = int(max(values)), 0.5, False
         if customSteps is None:
             customSteps = []
         if customSteps:
@@ -152,7 +152,6 @@ class LinearAlgebra:
                 steps = [25, 20, 30, 40, 50, 25, 15, 45, 75, 10, 5]
             else:
                 steps = [4, 3, 2, 1]
-                padding = 0.05
         dist = self.roundUp(maxVal - values[0], m=roundBy)
         ticks = []
         for step in steps:
@@ -164,7 +163,8 @@ class LinearAlgebra:
         if ticks and addZero and 0 not in ticks:
             ticks = np.insert(ticks, np.searchsorted(ticks, 0), 0)
         # print(f'Axis ticks: {ticks}\n')
-        padding = padAdj / 10
+        if padAdj:
+            padding = padAdj / 10
 
         return list(ticks), padding
 
