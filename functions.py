@@ -72,6 +72,8 @@ class LinearAlgebra:
         self.roundVal = 3
         self.headerLen = 80
         self.rstFloat = True
+        self.webBrowserFigs = True
+        self.overwriteFigs = False
 
         # Params: Figures
         self.figDir = 'Figures'
@@ -84,8 +86,7 @@ class LinearAlgebra:
         self.tickLength = 4
         self.figureResolution = 600
         
-        if not os.path.exists(self.figDir):
-            os.makedirs(self.figDir, exist_ok=True)
+        self.mkdir(self.figDir)
 
         # Set options
         pd.set_option('display.max_columns', None)
@@ -103,6 +104,21 @@ class LinearAlgebra:
             self.rstFloat = False
 
 
+    @staticmethod
+    def formatList(d):
+        if isinstance(d, nx.classes.reportviews.NodeView):
+            d = list(d)
+        elif not isinstance(d, list):
+            d = [d]
+        return d
+
+
+    @staticmethod
+    def mkdir(path):
+        if not os.path.exists(path):
+            os.makedirs(path, exist_ok=True)
+
+
     def header(self, txt=''):
         if txt:
             l = len(txt) + 2
@@ -113,15 +129,6 @@ class LinearAlgebra:
                 print(f'{"=" * b} {txt} {"=" * (b + 1)}')
         else:
             print('=' * self.headerLen)
-
-
-    @staticmethod
-    def formatList(d):
-        if isinstance(d, nx.classes.reportviews.NodeView):
-            d = list(d)
-        elif not isinstance(d, list):
-            d = [d]
-        return d
 
 
     @staticmethod
@@ -265,13 +272,33 @@ class LinearAlgebra:
                         label='Random Walk', pSpace=pSpace)
 
 
-    def saveFig(self, plot, figureName, fig=None):
-        self.header()
-        if figureName:
+    def getFigPath(self, figureName, figDir=''):
+        if figDir:
+            d = os.path.join(self.figDir, figDir)
+            path = os.path.join(d, figureName)
+            self.mkdir(d)
+        else:
             path = os.path.join(self.figDir, figureName)
+        if not path.endswith(('.png', '.jpg', '.jpeg')):
+            path = os.path.splitext(path)[0] + '.png'
+        return path
+
+
+    def saveFig(self, plot, figureName, pathDir):
+        path = self.getFigPath(figureName, pathDir)
+        if os.path.exists(path) and not self.overwriteFigs:
+            print(f'{yellow}Figure was already saved at path, the figure was not '
+                  f'overwritten:\n\t{path}{rst}\n')
+        else:
             plot.savefig(path, bbox_inches='tight')
             print(f'Figure was saved at path:\n\t{green}{path}{rst}\n')
-            subprocess.run(['xdg-open', path])  # Open fig in web browser
+
+    def plotFig(self, plot, figureName, pathDir='', fig=None):
+        if self.webBrowserFigs:
+            path = self.getFigPath(figureName, pathDir)
+            if os.path.exists(path):
+                plot.savefig(path, bbox_inches='tight')
+                subprocess.run(['xdg-open', path])  # Open fig in web browser
         else:
             fig.canvas.mpl_connect('key_press_event', pressKey)
             plt.show()
@@ -388,9 +415,7 @@ class LinearAlgebra:
                 ax.set_ylim(yTicks[0] - pad, yTicks[-1] + pad)
                 ax.set_yticks(yTicks)
         if len(yTicks) < 1:
-            print('man')
             ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-        print(f'Y-Ticks:\n{ax.get_yticks()}\n')
 
         # Grid
         if addGrid:
