@@ -1,5 +1,6 @@
 from collections import Counter
 from colorama import Fore, Style
+import math
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import networkx as nx
@@ -121,6 +122,42 @@ class LinearAlgebra:
         elif not isinstance(d, list):
             d = [d]
         return d
+
+
+    @staticmethod
+    def roundUp(v, m=5):
+        """
+        :param v: round this value
+        :param m: round value to a multiple of m
+        """
+        return int(math.ceil(v / m) * m)
+
+
+    def getAxisTicks(self, values, largeValues=True, customSteps=None,
+                     addZero=True):
+        values, padding, roundBy  = self.formatList(values), 0.05, 5
+        if customSteps is None:
+            customSteps = []
+        if customSteps:
+            steps = customSteps
+        else:
+            if largeValues:
+                steps = [25, 20, 30, 40, 50, 25, 15, 45, 75, 10, 5]
+            else:
+                steps = [4, 3, 2, 2.5, 1]
+                padding = 0.01
+        dist = self.roundUp(values[-1] - values[0], m=roundBy)
+        padding = int(padding * dist)
+        ticks = []
+        for step in steps:
+            if dist % step == 0:
+                ticks = list(np.arange(values[0], values[-1] + step, step))
+                if len(ticks) > 3:
+                    break
+        if ticks and addZero and 0 not in ticks:
+            ticks = np.insert(ticks, np.searchsorted(ticks, 0), 0)
+            print(f'Axis ticks: {ticks}\n')
+        return list(ticks), padding
 
 
     def showMatrix(self, array, idx='', col='', label='Matrix', label2='',
@@ -262,39 +299,111 @@ class LinearAlgebra:
         return G
 
 
-    def plotLines(self, data, colors, title,
-                  labelX, labelY, yRotate=0, browserFig=False):
+    def plotLines(self, data, colors, title, figName, labelX, labelY, yRotate=0,
+                  figDir='', addGrid=True, saveFig=True):
+        """
+        :param data: [pd.DataFrame or list of pd.DataFrames]
+        :param title: [str] figure title
+        :param colors: [list] colors for the lines
+        :param figName: [str] file name for the saved figure
+        :param labelX: [str] axis label
+        :param labelY: [str] axis label
+        :param yRotate: [int] rotate the y-label
+        :param figDir: [str] save the fig at self.figDir/{figDir}/
+            if an empty string is provided the fig will be saved at self.figDir/
+        :param addGrid: [bool] add grid to the figure
+        :param saveFig: [bool] True: saves the fig, False: does not save the fig
+        """
+        colors = self.formatList(colors)
+        # Verify that there are a sufficient number of strings
+        df = True
+        if isinstance(data, pd.DataFrame):
+            numCurves = len(data.columns)
+        else:
+            numCurves = len(data)
+            df = False
+        c = ['black', 'crimson', 'gold', 'darkgreen', 'lightgreen', 'limegreen',
+             'teal', 'turquoise', 'royalblue', 'indigo', 'darkviolet', 'gray']
+        diff, n = numCurves - len(colors), len(c)
+        if diff > n:
+            print(1)
+            for _ in range(diff):
+                colors.append(c[random.randint(0, n - 1)])
+        else:
+            i = 0
+            while diff + 1 > len(colors):
+                if i > 30:
+                    break
+                clr = c[random.randint(0, n - 1)]
+                if clr not in colors:
+                    colors.append(clr)
+                i += 1
+            diff = numCurves - len(colors)
+            if diff != 0:
+                for _ in range(diff):
+                    colors.append(c[random.randint(0, n - 1)])
+
+        # Plot figure
         fig, ax = plt.subplots(figsize=self.figSize)
-        for i in range(data.columns.size):
-            ax.plot(data.index, data.iloc[:,i], color=colors[i],
-                    label=data.columns[i], linewidth=self.lineThickness)
-        ax.legend(fontsize=self.labelSizeTicks, loc='best',
-                  edgecolor='black', framealpha=0.8)
+        xTicks = []
+        if df:
+            xTicks = list(data.index)
+            for i in range(numCurves):
+                ax.plot(data.index, data.iloc[:, i], color=colors[i],
+                        label=data.columns[i], linewidth=self.lineThickness)
+        else:
+            for i, d in enumerate(data):
+                if not xTicks:
+                    xTicks = list(d.index)
+                for c in range(len(d.columns)):
+                    ax.plot(d.index, d.iloc[:, c], color=colors[i],
+                            label=d.columns[c], linewidth=self.lineThickness)
+        ax.legend(fontsize=self.labelSizeTicks, loc='best', edgecolor='black',
+                  framealpha=0.8)
+        ax.axhline(y=0, color='black', linewidth=self.lineThickness)
 
         # Styling
         ax.set_title(title, fontsize=self.labelSizeTitle, fontweight='bold')
         ax.set_xlabel(labelX, fontsize=self.labelSizeAxis)
         ax.set_ylabel(labelY, fontsize=self.labelSizeAxis, labelpad=20, rotation=yRotate)
-        ax.tick_params(labelsize=12)
+        ax.tick_params(labelsize=12, width=self.lineThickness)
 
         # Axis params
-        xTicks, pad = getAxisTicks(values=data.index)
         if xTicks:
-            ax.set_xlim(data.index[0]-pad, data.index[-1]+pad)
+            large = True if max(xTicks) >= 10 else False
+            xTicks, pad = self.getAxisTicks(values=xTicks, largeValues=large)
+            if 0 not in xTicks:
+                xTicks = np.insert(xTicks, np.searchsorted(xTicks, 0), 0)
+            ax.set_xlim(xTicks[0] - pad, xTicks[-1] + pad)
+
             ax.set_xticks(xTicks)
         else:
             ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-        if max(ax.get_ylim()) > 1:
-            ax.set_ylim(top=int(np.ceil(ax.get_ylim()[1])))
+        yTicks = ax.get_yticks()
+        if len(yTicks) > 0:
+            large = True if max(yTicks) >= 10 else False
+            yTicks, pad = self.getAxisTicks(values=yTicks, largeValues=large)
+            if len(yTicks) > 0:
+                ax.set_ylim(yTicks[0] - pad, yTicks[-1] + pad)
+                ax.set_yticks(yTicks)
+        if len(yTicks) < 1:
+            print('man')
+            ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+        print(f'Y-Ticks:\n{ax.get_yticks()}\n')
 
         # Grid
-        ax.grid(True, linewidth=0.25, color='black')
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
+        if addGrid:
+            ax.grid(True, linewidth=self.lineThickness, color='lightgrey')
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
 
         for _, spine in ax.spines.items():
             spine.set_visible(True)
+            spine.set_linewidth(self.lineThickness)
 
         plt.tight_layout()
-        self.saveFig(plot=plt, figureName=browserFig, fig=fig)
+        if saveFig:
+            self.saveFig(plot=plt, figureName=figName, pathDir=figDir)
+        self.plotFig(
+            plot=plt, figureName=figName, pathDir=figDir, fig=fig
+        )
