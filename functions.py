@@ -116,7 +116,7 @@ class LinearAlgebra:
 
 
     @staticmethod
-    def checkList(d):
+    def formatList(d):
         if isinstance(d, nx.classes.reportviews.NodeView):
             d = list(d)
         elif not isinstance(d, list):
@@ -167,8 +167,8 @@ class LinearAlgebra:
         # if not idx and len(array) > 1:
         #     idx = [i for i in range(len(array))]
         # else:
-        idx = self.checkList(idx)
-        col = self.checkList(col)
+        idx = self.formatList(idx)
+        col = self.formatList(col)
         if label2:
             print(f'{green}{label}{rst}: {pink}{label2}{rst}')
         else:
@@ -188,8 +188,8 @@ class LinearAlgebra:
                    label2='', pHeader=False, pSpace=False):
         if pHeader:
             self.header()
-        idx = self.checkList(idx)
-        col = self.checkList(col)
+        idx = self.formatList(idx)
+        col = self.formatList(col)
         if label2:
             print(f'{gold}{label}{rst}: {pink}{label2}{rst}')
         else:
@@ -314,8 +314,9 @@ class LinearAlgebra:
         :param addGrid: [bool] add grid to the figure
         :param saveFig: [bool] True: saves the fig, False: does not save the fig
         """
-        colors = self.formatList(colors)
+
         # Verify that there are a sufficient number of strings
+        colors = self.formatList(colors)
         df = True
         if isinstance(data, pd.DataFrame):
             numCurves = len(data.columns)
