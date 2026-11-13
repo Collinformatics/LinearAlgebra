@@ -79,9 +79,10 @@ class LinearAlgebra:
         self.figDir = 'Figures'
         self.figSize = (9.5, 8) # (width, height)
         self.figSizeWide = (9.5, 5)
-        self.labelSizeTitle = 20 # Set font-sizeself.figDir='Figures'
-        self.labelSizeAxis = 16 # Set font-size
-        self.labelSizeTicks = 12 # Set font-size
+        self.labelSizeTitle = 20  # Set font-size
+        self.labelSizeAxis = 16  # Set font-size
+        self.labelSizeTicks = 14  # Set font-size
+        self.labelSizeLegend = 13
         self.lineThickness = 1.5
         self.tickLength = 4
         self.figureResolution = 600
@@ -137,36 +138,7 @@ class LinearAlgebra:
         :param v: round this value
         :param m: round value to a multiple of m
         """
-        return int(math.ceil(v / m) * m)
-
-    def getAxisTicks(self, values, largeValues=True, customSteps=None,
-                     addZero=True):
-        values, roundBy = self.formatList(values), 5
-        maxVal, padding, padAdj = int(max(values)), 0.5, False
-        if customSteps is None:
-            customSteps = []
-        if customSteps:
-            steps = customSteps
-        else:
-            if largeValues:
-                steps = [25, 20, 30, 40, 50, 25, 15, 45, 75, 10, 5]
-            else:
-                steps = [4, 3, 2, 1]
-        dist = self.roundUp(maxVal - values[0], m=roundBy)
-        ticks = []
-        for step in steps:
-            if dist % step == 0:
-                ticks = list(np.arange(values[0], maxVal + step, step))
-                if len(ticks) > 3:
-                    padAdj = step
-                    break
-        if ticks and addZero and 0 not in ticks:
-            ticks = np.insert(ticks, np.searchsorted(ticks, 0), 0)
-        # print(f'Axis ticks: {ticks}\n')
-        if padAdj:
-            padding = padAdj / 10
-
-        return list(ticks), padding
+        return int(np.ceil(v / m) * m)
 
 
     def showMatrix(self, array, idx='', col='', label='Matrix', label2='',
@@ -327,6 +299,45 @@ class LinearAlgebra:
 
         return G
 
+
+    def getAxisTicks(self, values, largeValues=True, customSteps=None,
+                     addZero=True):
+        values, roundBy = self.formatList(values), 5
+        maxVal, padding, padAdj = int(max(values)), 0.5, False
+        if customSteps is None:
+            customSteps = []
+        if customSteps:
+            steps = customSteps
+        else:
+            if largeValues:
+                steps = [25, 20, 30, 40, 50, 25, 15, 45, 75, 10, 5]
+            else:
+                steps = [4, 3, 2, 1]
+        dist, ticks = self.roundUp(maxVal - values[0], m=roundBy), []
+        for step in steps:
+            if dist % step == 0:
+                ticks = list(np.arange(values[0], maxVal + step, step))
+                if len(ticks) > 3:
+                    padAdj = step
+                    break
+        if ticks and addZero and 0 not in ticks:
+            ticks = np.insert(ticks, np.searchsorted(ticks, 0), 0)
+        if max(ticks) < np.ceil(max(values)) - 1:
+            self.header()
+            print(f'\nNEW: max ({max(ticks)}) < np.ceil(max(values))-1'
+                  f' ({np.ceil(max(values))-1})\n\n'
+                  f'Ticks: {ticks}')
+            space = ticks[-1] - ticks[-2]
+            ticks = np.insert(ticks, np.searchsorted(ticks, max(ticks) + space), 0)
+            print(f'\nTicks: {ticks}\n')
+            self.header()
+            print()
+        if padAdj:
+            padding = padAdj / 10
+
+        return list(ticks), padding
+
+
     def plotLines(self, data, colors, title, figName, labelX, labelY, yRotate=0,
                   figDir='', addGrid=True, saveFig=True):
         """
@@ -349,13 +360,14 @@ class LinearAlgebra:
         if isinstance(data, pd.DataFrame):
             numCurves = len(data.columns)
         else:
-            numCurves = len(data)
+            numCurves = 0
+            for d in data:
+                numCurves += len(d.columns)
             df = False
         c = ['black', 'crimson', 'gold', 'darkgreen', 'lightgreen', 'limegreen',
              'teal', 'turquoise', 'royalblue', 'indigo', 'darkviolet', 'gray']
         diff, n = numCurves - len(colors), len(c)
         if diff > n:
-            print(1)
             for _ in range(diff):
                 colors.append(c[random.randint(0, n - 1)])
         else:
@@ -374,20 +386,22 @@ class LinearAlgebra:
 
         # Plot figure
         fig, ax = plt.subplots(figsize=self.figSize)
-        xTicks = []
+        xTicks = None
         if df:
-            xTicks = list(data.index)
+            xTicks = pd.Series(data.index)
             for i in range(numCurves):
                 ax.plot(data.index, data.iloc[:, i], color=colors[i],
                         label=data.columns[i], linewidth=self.lineThickness)
         else:
-            for i, d in enumerate(data):
-                if not xTicks:
-                    xTicks = list(d.index)
-                for c in range(len(d.columns)):
-                    ax.plot(d.index, d.iloc[:, c], color=colors[i],
-                            label=d.columns[c], linewidth=self.lineThickness)
-        ax.legend(fontsize=self.labelSizeTicks, loc='best', edgecolor='black',
+            i = 0
+            for idx, d in enumerate(data):
+                if xTicks is None:
+                    xTicks = pd.Series(d.index)
+                for idxC in range(len(d.columns)):
+                    ax.plot(d.index, d.iloc[:, idxC], color=colors[i],
+                            label=d.columns[idxC], linewidth=self.lineThickness)
+                    i += 1
+        ax.legend(fontsize=self.labelSizeLegend, loc='best', edgecolor='black',
                   framealpha=0.8)
         ax.axhline(y=0, color='black', linewidth=self.lineThickness)
 
@@ -395,19 +409,19 @@ class LinearAlgebra:
         ax.set_title(title, fontsize=self.labelSizeTitle, fontweight='bold')
         ax.set_xlabel(labelX, fontsize=self.labelSizeAxis)
         ax.set_ylabel(labelY, fontsize=self.labelSizeAxis, labelpad=20, rotation=yRotate)
-        ax.tick_params(labelsize=12, width=self.lineThickness)
+        ax.tick_params(labelsize=self.labelSizeTicks, width=self.lineThickness)
 
-        # Set: y-ticks
-        if xTicks:
-            large = True if max(xTicks) >= 10 else False
-            xTicks, pad = self.getAxisTicks(values=xTicks, largeValues=large)
-            print(f'Ticks: {xTicks}\n* Pad: {pad}\n')
-            if 0 not in xTicks:
-                xTicks = np.insert(xTicks, np.searchsorted(xTicks, 0), 0)
-            ax.set_xlim(xTicks[0] - pad, xTicks[-1] + pad)
-            ax.set_xticks(xTicks)
-        elif not xTicks or len(xTicks) > 12:
+        # Set: x-ticks
+        large = True if max(xTicks) >= 10 else False
+        xTicks, pad = self.getAxisTicks(values=xTicks, largeValues=large)
+        if 0 not in xTicks:
+            xTicks = np.insert(xTicks, np.searchsorted(xTicks, 0), 0)
+        ax.set_xlim(xTicks[0] - pad, xTicks[-1] + pad)
+        ax.set_xticks(xTicks)
+        if len(xTicks) > 12:
             ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        # print(f'X-Ticks: {ax.get_xticks()}\n'
+        #       f'X-Lim: {ax.get_xlim()}\n')
 
         # Set: y-ticks
         yTicks = ax.get_yticks()
