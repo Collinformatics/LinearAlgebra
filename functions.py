@@ -67,13 +67,13 @@ def getAxisTicks(values, largeValues=True, customSteps=None):
 
 
 class LinearAlgebra:
-    def __init__(self):
+    def __init__(self, overwriteFigs=False):
         self.printN = 10
         self.roundVal = 3
         self.headerLen = 80
         self.rstFloat = True
         self.webBrowserFigs = True
-        self.overwriteFigs = False
+        self.overwriteFigs = overwriteFigs
 
         # Params: Figures
         self.figDir = 'Figures'
